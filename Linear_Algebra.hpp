@@ -24,10 +24,6 @@ vector<T>::vector(const int N){
 		v[i] = 0.;
 	}
 	dim = N;
-	for(int i=0; i<N; ++i){
-		cout << v[i] << endl;
-	}
-	printf("%p\n", v);
 }
 
 template <typename T>
@@ -38,10 +34,8 @@ T& vector<T>::operator()(const int i){
 template <typename T>
 void vector<T>::show(){
 	for(int i=0; i<dim; ++i){
-		//cout << v[i] << endl;
-		printf("%f\n", v[i]);
+		cout << v[i] << endl;
 	}
-	printf("%p\n", v);
 }
 
 }

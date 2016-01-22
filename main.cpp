@@ -5,8 +5,10 @@ using namespace std;
 
 int main(){
 
-	LA::vector<double> myvector(20);
+	LA::vector<double> myvector(10);
 
+	myvector.show();
+	
 	myvector(4) = 5.5;
 
 	myvector.show();
