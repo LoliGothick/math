@@ -19,7 +19,7 @@ public:
 
 template <typename T>
 vector<T>::vector(const int N){
-	auto v = new T[N];
+	v = new T[N];
 	for(int i=0; i<N; ++i){
 		v[i] = 0.;
 	}
