@@ -10,7 +10,7 @@ int main(){
 	LA::vector<double> b(dim);
 	LA::vector<double> c(dim);
 
-	//a.show();
+	a.show();
 	
 	a(4) = 5.5;
 	b(4) = 0.5;
