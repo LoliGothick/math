@@ -13,6 +13,7 @@ public:
 	int dim;
 
 	vector(const int);
+	~vector();
 	T& operator()(const int);
 	void show();
 };
@@ -24,6 +25,11 @@ vector<T>::vector(const int N){
 		v[i] = 0.;
 	}
 	dim = N;
+}
+
+template <typename T>
+vector<T>::~vector(){
+	delete[] v;
 }
 
 template <typename T>
