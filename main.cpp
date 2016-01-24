@@ -2,16 +2,22 @@
 #include "Linear_Algebra.hpp"
 using namespace std;
 
+const double dim = 10;
 
 int main(){
 
-	LA::vector<double> myvector(10);
+	LA::vector<double> a(dim);
+	LA::vector<double> b(dim);
+	LA::vector<double> c(dim);
 
-	myvector.show();
+	//a.show();
 	
-	myvector(4) = 5.5;
+	a(4) = 5.5;
+	b(4) = 0.5;
 
-	myvector.show();
+	c = a + b;
+
+	c.show();
 
 	return 0;
 }

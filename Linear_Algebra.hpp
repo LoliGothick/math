@@ -1,6 +1,4 @@
 #include <iostream>
-#include <memory>
-#include <cstdlib>
 using namespace std;
 
 namespace LA{
@@ -8,39 +6,73 @@ namespace LA{
 template <typename T>
 class vector{
 public:
-	//shared_ptr<T> *v;
-	T *v;
+	T *vec;
 	int dim;
 
 	vector(const int);
 	~vector();
+	
 	T& operator()(const int);
+	vector<T> operator+(const vector<T>&);
+	vector<T> operator-(const vector<T>&);
+	void operator=(const vector<T>&);
+	
 	void show();
 };
 
 template <typename T>
+vector<T> vector<T>::operator+(const vector<T> &obj){
+	/*
+	if(dim != obj.dim){
+		cout << "error dim doesn't not match."
+	}
+	*/
+	vector<T> ans(dim);
+	for(int i=0; i<dim; ++i){
+		ans.vec[i] = vec[i] + obj.vec[i];
+	}
+	return ans;
+}
+
+template <typename T>
+vector<T> vector<T>::operator-(const vector<T> &obj){
+	vector<T> ans(dim);
+	for(int i=0; i<dim; ++i){
+		ans.vec[i] = vec[i] - obj.vec[i];
+	}
+	return ans;
+}
+
+template <typename T>
+void vector<T>::operator=(const vector<T> &obj){
+	for(int i=0; i<dim; ++i){
+		this->vec[i] = obj.vec[i];
+	}
+}
+
+template <typename T>
 vector<T>::vector(const int N){
-	v = new T[N];
+	vec = new T[N];
 	for(int i=0; i<N; ++i){
-		v[i] = 0.;
+		vec[i] = 0.;
 	}
 	dim = N;
 }
 
 template <typename T>
 vector<T>::~vector(){
-	delete[] v;
+	delete[] vec;
 }
 
 template <typename T>
 T& vector<T>::operator()(const int i){
-	return v[i];
+	return vec[i];
 }
 
 template <typename T>
 void vector<T>::show(){
 	for(int i=0; i<dim; ++i){
-		cout << v[i] << endl;
+		cout << vec[i] << endl;
 	}
 }
 
