@@ -17,7 +17,9 @@ int main(){
 
 	a.show();
 	b.show();
-	
+
+	cout << b.norm() << endl;
+	cout << a*b << endl;
 
 	c = a + b;
 

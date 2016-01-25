@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 using namespace std;
 
 namespace LA{
@@ -20,6 +21,9 @@ public:
 	void operator=(const vector<T>&);
 	void operator+=(const vector<T>&);
 	void operator-=(const vector<T>&);
+
+	T operator*(const vector<T>&);
+	T norm();
 
 	void show();
 };
@@ -95,6 +99,24 @@ void vector<T>::show(){
 	cout << endl;
 }
 
+template <typename T>
+T vector<T>::operator*(const vector<T> &obj){
+	T ans = 0;
+	for(int i=0; i<dim; ++i){
+		ans += this->vec[i] * obj.vec[i];
+	}
+	return ans;
+}
+
+template <typename T>
+T vector<T>::norm(){
+	T ans=0;
+	for(int i=0; i<dim; ++i){
+		ans += vec[i] * vec[i];
+	}
+	return pow(ans, 0.5);
+}
+
 /* scalar multiplication */
 
 template <typename T>
@@ -106,13 +128,4 @@ vector<T> operator*(const T &k, const vector<T> &obj){
 	return ans;
 }
 
-/*
-vector<double> operator*(const double &k, const vector<double> &obj){
-	vector<double> ans(obj.dim);
-	for(int i=0; i<obj.dim; ++i){
-		ans.vec[i] = k * obj.vec[i];
-	}
-	return ans;
-}
-*/
 }
