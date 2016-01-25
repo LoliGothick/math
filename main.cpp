@@ -10,10 +10,14 @@ int main(){
 	LA::vector<double> b(dim);
 	LA::vector<double> c(dim);
 
-	//a.show(); test
+	for(int i=0; i<dim; ++i){
+		a(i) = i+0.2;
+		b(i) = 3.;
+	}
+
+	a.show();
+	b.show();
 	
-	a(4) = 5.5;
-	b(4) = 0.5;
 
 	c = a + b;
 

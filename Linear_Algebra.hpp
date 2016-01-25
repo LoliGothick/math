@@ -13,10 +13,14 @@ public:
 	~vector();
 	
 	T& operator()(const int);
+	
 	vector<T> operator+(const vector<T>&);
 	vector<T> operator-(const vector<T>&);
+
 	void operator=(const vector<T>&);
-	
+	void operator+=(const vector<T>&);
+	void operator-=(const vector<T>&);
+
 	void show();
 };
 
@@ -51,6 +55,20 @@ void vector<T>::operator=(const vector<T> &obj){
 }
 
 template <typename T>
+void vector<T>::operator+=(const vector<T> &obj){
+	for(int i=0; i<dim; ++i){
+		this->vec[i] = this->vec[i] + obj.vec[i];
+	}
+}
+
+template <typename T>
+void vector<T>::operator-=(const vector<T> &obj){
+	for(int i=0; i<dim; ++i){
+		this->vec[i] = this->vec[i] - obj.vec[i];
+	}
+}
+
+template <typename T>
 vector<T>::vector(const int N){
 	vec = new T[N];
 	for(int i=0; i<N; ++i){
@@ -74,6 +92,21 @@ void vector<T>::show(){
 	for(int i=0; i<dim; ++i){
 		cout << vec[i] << endl;
 	}
+	cout << endl;
 }
+
+
+
+/* scalar multiplication */
+
+template <typename T>
+vector<T> operator*(const T &k, const vector<T> &obj);
+	vector<T> ans(obj.dim);
+	for(int i=0; i<obj.dim; ++i){
+		ans.vec[i] = k * obj.vec[i];
+	}
+	return ans;
+}
+
 
 }
