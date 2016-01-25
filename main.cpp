@@ -23,5 +23,9 @@ int main(){
 
 	c.show();
 
+	c = 3.*c;
+
+	c.show();
+
 	return 0;
 }
