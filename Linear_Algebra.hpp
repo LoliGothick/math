@@ -95,10 +95,8 @@ void vector<T>::show(){
 	cout << endl;
 }
 
-
-
 /* scalar multiplication */
-
+/*
 template <typename T>
 vector<T> operator*(const T &k, const vector<T> &obj);
 	vector<T> ans(obj.dim);
@@ -107,6 +105,14 @@ vector<T> operator*(const T &k, const vector<T> &obj);
 	}
 	return ans;
 }
+*/
 
+vector<double> operator*(const double &k, const vector<double> obj);
+	vector<double> ans(obj.dim);
+	for(int i=0; i<obj.dim; ++i){
+		ans.vec[i] = k * obj.vec[i];
+	}
+	return ans;
+}
 
 }
