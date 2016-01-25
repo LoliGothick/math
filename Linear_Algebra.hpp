@@ -1,9 +1,13 @@
 #include <iostream>
 #include <cmath>
+#include <iomanip>
 using namespace std;
 
 namespace LA{
 
+/********************************************/
+/*            vector class                  */
+/********************************************/
 template <typename T>
 class vector{
 public:
@@ -127,5 +131,49 @@ vector<T> operator*(const T &k, const vector<T> &obj){
 	}
 	return ans;
 }
+
+/********************************************/
+/*            matrix class                  */
+/********************************************/
+
+template <typename T>
+class matrix{
+public:
+	T *mat;
+	int dim;
+	
+	matrix(int);
+
+	T& operator()(const int &, const int &);
+
+	void show();
+};
+
+template <typename T>
+T& matrix<T>::operator()(const int &m, const int &n){
+	return mat[n*dim + m];
+}
+
+template <typename T>
+void matrix<T>::show(){
+	cout << fixed << setprecision(4);
+	for(int i=0; i<dim; ++i){
+		for(int j=0; j<dim; ++j){
+			cout << this->operator()(i,j) << " ";
+		}
+		cout << endl;
+	}
+}
+
+template <typename T>
+matrix<T>::matrix(int n){
+	mat = new T[n * n];
+	dim = n;
+
+	for(int i=0; i<(dim*dim); ++i){
+		mat[i] = 0;
+	}
+}
+
 
 }

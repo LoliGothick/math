@@ -2,10 +2,23 @@
 #include "Linear_Algebra.hpp"
 using namespace std;
 
-const double dim = 10;
+const double dim = 20;
 
 int main(){
 
+	LA::matrix<double> m(dim);
+
+	for(int i=0; i<dim; ++i){
+		for(int j=0; j<dim; ++j){
+			m(i,j) = 1./(i + j + 1);
+		}
+	}
+
+	m.show();
+
+
+
+/*
 	LA::vector<double> a(dim);
 	LA::vector<double> b(dim);
 	LA::vector<double> c(dim);
@@ -28,6 +41,6 @@ int main(){
 	c = 3.*c;
 
 	c.show();
-
+*/
 	return 0;
 }
