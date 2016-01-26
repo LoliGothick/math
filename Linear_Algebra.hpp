@@ -228,4 +228,16 @@ matrix<T> operator*(const T &k, matrix<T> &mat){
 	return ans;
 }
 
+template <typename T>
+vector<T> operator*(matrix<T> &mat, vector<T> &vec){
+	vector<T> ans(vec.dim);
+	int dim = vec.dim;
+	for(int i=0; i<dim; ++i){
+		for(int j=0; j<dim; ++j){
+			ans(i) += mat(i,j) * vec(j);
+		}
+	}
+	return ans;
+}
+
 }

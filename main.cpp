@@ -27,7 +27,7 @@ int main(){
 	ans = m - m;
 	ans.show();
 
-/*
+
 	LA::vector<double> a(dim);
 	LA::vector<double> b(dim);
 	LA::vector<double> c(dim);
@@ -50,6 +50,11 @@ int main(){
 	c = 3.*c;
 
 	c.show();
-*/
+
+
+	c = m * a;
+
+	c.show();
+
 	return 0;
 }
