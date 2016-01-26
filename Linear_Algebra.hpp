@@ -11,6 +11,7 @@ namespace LA{
 template <typename T>
 class vector{
 public:
+	//unique_ptr<T> vec;
 	T *vec;
 	int dim;
 
@@ -87,6 +88,7 @@ vector<T>::vector(const int N){
 
 template <typename T>
 vector<T>::~vector(){
+	//cout << "memory free" << endl;
 	delete[] vec;
 }
 
@@ -147,6 +149,7 @@ public:
 
 	T& operator()(int &, int &);
 
+	void operator=(const matrix<T> &);
 	matrix<T> operator+(matrix<T> &);
 	matrix<T> operator-(matrix<T> &);
 
@@ -156,6 +159,16 @@ public:
 template <typename T>
 T& matrix<T>::operator()(int &m, int &n){
 	return mat[n*dim + m];
+}
+
+template <typename T>
+void matrix<T>::operator=(const matrix<T> &obj){
+	int dim = this->dim;
+	for(int i=0; i<dim; ++i){
+		for(int j=0; j<dim; ++j){
+			this->mat[j*dim + i] = obj.mat[j*dim + i];
+		}
+	}
 }
 
 template <typename T>

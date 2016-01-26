@@ -17,17 +17,16 @@ int main(){
 		}
 	}
 
-	//(m + n).show();
+	(m + n).show();
 
-	ans = m * n;
+	ans = (m * n);
 
 	ans.show();
 
 
-	ans = m - m;
+	ans = (m - m);
 	ans.show();
-
-
+	
 	LA::vector<double> a(dim);
 	LA::vector<double> b(dim);
 	LA::vector<double> c(dim);
@@ -50,7 +49,6 @@ int main(){
 	c = 3.*c;
 
 	c.show();
-
 
 	c = m * a;
 
