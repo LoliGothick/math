@@ -7,15 +7,21 @@ const double dim = 20;
 int main(){
 
 	LA::matrix<double> m(dim);
+	LA::matrix<double> n(dim);
+	LA::matrix<double> ans(dim);
 
 	for(int i=0; i<dim; ++i){
 		for(int j=0; j<dim; ++j){
-			m(i,j) = 1./(i + j + 1);
+			m(i,j) = 1.5;//1./(i + j + 1);
+			n(i,j) = 0.4;
 		}
 	}
 
-	m.show();
+	//(m + n).show();
 
+	ans = m - n;
+
+	ans.show();
 
 
 /*

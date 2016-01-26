@@ -144,14 +144,39 @@ public:
 	
 	matrix(int);
 
-	T& operator()(const int &, const int &);
+	T& operator()(int &, int &);
+
+	matrix<T> operator+(matrix<T> &);
+	matrix<T> operator-(matrix<T> &);
 
 	void show();
 };
 
 template <typename T>
-T& matrix<T>::operator()(const int &m, const int &n){
+T& matrix<T>::operator()(int &m, int &n){
 	return mat[n*dim + m];
+}
+
+template <typename T>
+matrix<T> matrix<T>::operator+(matrix<T> &obj){
+	matrix<T> ans(this->dim);
+	for(int i=0; i<dim; ++i){
+		for(int j=0; j<dim; ++j){
+			ans(i,j) = this->operator()(i, j) + obj.operator()(i,j);
+		}
+	}
+	return ans;
+}
+
+template <typename T>
+matrix<T> matrix<T>::operator-(matrix<T> &obj){
+	matrix<T> ans(this->dim);
+	for(int i=0; i<dim; ++i){
+		for(int j=0; j<dim; ++j){
+			ans(i,j) = this->operator()(i, j) - obj.operator()(i,j);
+		}
+	}
+	return ans;
 }
 
 template <typename T>
@@ -159,7 +184,7 @@ void matrix<T>::show(){
 	cout << fixed << setprecision(4);
 	for(int i=0; i<dim; ++i){
 		for(int j=0; j<dim; ++j){
-			cout << this->operator()(i,j) << " ";
+			cout << this->operator()(i, j) << " ";
 		}
 		cout << endl;
 	}
@@ -174,6 +199,8 @@ matrix<T>::matrix(int n){
 		mat[i] = 0;
 	}
 }
+
+/* scalar multiplication */
 
 
 }
