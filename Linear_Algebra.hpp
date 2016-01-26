@@ -200,7 +200,32 @@ matrix<T>::matrix(int n){
 	}
 }
 
-/* scalar multiplication */
+/*     multiplication       */
 
+template <typename T>
+matrix<T> operator*(matrix<T> &mat1, matrix<T> &mat2){
+	matrix<T> ans(mat1.dim);
+	int dim = mat1.dim;
+	for(int i=0; i<dim; ++i){
+		for(int j=0; j<dim; ++j){
+			for(int k=0; k<dim; ++k){
+				ans(i,j) += mat1(i,k) * mat2(k,j);
+			}
+		}
+	}
+	return ans;
+}
+
+template <typename T>
+matrix<T> operator*(const T &k, matrix<T> &mat){
+	matrix<T> ans(mat.dim);
+	int dim = mat.dim;
+	for(int i=0; i<dim; ++i){
+		for(int j=0; j<dim; ++j){
+			ans.operator()(i,j) = k * mat.operator()(i,j);
+		}
+	}
+	return ans;
+}
 
 }

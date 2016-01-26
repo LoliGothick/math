@@ -12,17 +12,20 @@ int main(){
 
 	for(int i=0; i<dim; ++i){
 		for(int j=0; j<dim; ++j){
-			m(i,j) = 1.5;//1./(i + j + 1);
-			n(i,j) = 0.4;
+			m(i,j) = 1.1;//1./(i + j + 1);
+			n(i,j) = 0.9;
 		}
 	}
 
 	//(m + n).show();
 
-	ans = m - n;
+	ans = m * n;
 
 	ans.show();
 
+
+	ans = m - m;
+	ans.show();
 
 /*
 	LA::vector<double> a(dim);
