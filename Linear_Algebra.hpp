@@ -37,7 +37,7 @@ template <typename T>
 vector<T> vector<T>::operator+(const vector<T> &obj){
 	/*
 	if(dim != obj.dim){
-		cout << "error dim doesn't not match."
+		cout << "error dim doesn't match."
 	}
 	*/
 	vector<T> ans(dim);
