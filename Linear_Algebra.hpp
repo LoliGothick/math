@@ -143,6 +143,7 @@ public:
 	int dim;
 	
 	matrix(int);
+	~matrix();
 
 	T& operator()(int &, int &);
 
@@ -198,6 +199,11 @@ matrix<T>::matrix(int n){
 	for(int i=0; i<(dim*dim); ++i){
 		mat[i] = 0;
 	}
+}
+
+template <typename T>
+matrix<T>::~matrix(){
+	delete[] mat;
 }
 
 /*     multiplication       */
