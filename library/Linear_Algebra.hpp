@@ -202,6 +202,7 @@ void matrix<T>::show(){
 		}
 		cout << endl;
 	}
+	cout << endl;
 }
 
 template <typename T>

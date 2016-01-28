@@ -49,8 +49,8 @@ int main(){
 		}
 	}
 
-	//L.show();
-	//U.show();
+	L.show();
+	U.show();
 
 	(L*U).show();
 
