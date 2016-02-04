@@ -3,7 +3,7 @@
 
 using namespace std;
 
-const int dim = 30;
+const int dim = 25;
 
 int main(){
 
