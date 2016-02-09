@@ -3,7 +3,7 @@
 
 using namespace std;
 
-const int dim = 10;
+const int dim = 12;
 
 int main(){
 
@@ -13,7 +13,9 @@ int main(){
 
 	for(int i=0; i<dim; ++i){
 		for(int j=0; j<dim; ++j){
-			A(i,j) = 1./(i+j+1);
+			//A(i,j) = 1./(i+j+1);
+			if(i==j) A(i,j) = 2.;
+			if((i==(j-1) || (i==(j+1)))) A(i,j) = 1.;
 		}
 	}
 
@@ -88,7 +90,5 @@ int main(){
 
 	x.show();
 	
-
-
 	return 0;
 }
