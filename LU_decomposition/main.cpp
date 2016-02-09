@@ -3,7 +3,7 @@
 
 using namespace std;
 
-const int dim = 30;
+const int dim = 10;
 
 int main(){
 
@@ -42,7 +42,7 @@ int main(){
 				sum = sum + L(j,k) * U(k,i);
 			}
 			if(L(j,j) == 0.) {
-				printf("det(L) close to 0!\n Can't divide by 0...\n");
+				cout << "det(L) close to 0!\n Can't divide by 0..." << endl;
 				exit(EXIT_FAILURE);
 			}
 			U(j,i) = (A(j,i) - sum) / L(j,j);
@@ -53,6 +53,42 @@ int main(){
 	U.show();
 
 	(L*U).show();
+
+
+	LA::vector<double> x(dim);
+	LA::vector<double> y(dim);
+	LA::vector<double> b(dim);
+
+	for(int i=0; i<x.dim; ++i){
+		x(i) = 1.;
+	}
+
+	b = A * x;
+
+	b.show();
+	
+	for(int i=0; i<x.dim; ++i){
+		x(i) = 0.;
+	}
+
+	for(int i=0; i<b.dim; ++i){
+		y(i) = b(i);
+		for(int j=0; j<i; ++j){
+			y(i) -= L(i,j) * y(j);
+		}
+		y(i) = y(i) / L(i,i);
+	}
+
+	for(int i=b.dim; i>=0; --i){
+		x(i) = y(i);
+		for(int j=x.dim; j>i; --j){
+			x(i) -= U(i,j) * x(j);
+		}
+	}
+
+	x.show();
+	
+
 
 	return 0;
 }

@@ -99,6 +99,7 @@ T& vector<T>::operator()(const int i){
 
 template <typename T>
 void vector<T>::show(){
+	cout << fixed << setprecision(15);
 	for(int i=0; i<dim; ++i){
 		cout << vec[i] << endl;
 	}
