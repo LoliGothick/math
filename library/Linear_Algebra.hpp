@@ -27,6 +27,7 @@ public:
 	vector<T> operator-(const vector<T>&);
 
 	void operator=(const vector<T>&);
+	void operator=(const T &);
 	void operator+=(const vector<T>&);
 	void operator-=(const vector<T>&);
 
@@ -35,6 +36,13 @@ public:
 
 	void show();
 };
+
+template <typename T>
+void vector<T>::operator=(const T &s){
+	for(int i=0; i<dim; ++i){
+		vec[i] = s;
+	}
+}
 
 template <typename T>
 vector<T> vector<T>::operator+(const vector<T> &obj){
@@ -148,8 +156,11 @@ public:
 	T *mat;
 	int dim;
 	
+	matrix();
 	matrix(int);
 	~matrix();
+
+	void setter(int);
 
 	T& operator()(int &, int &);
 
@@ -159,6 +170,22 @@ public:
 
 	void show();
 };
+
+template <typename T>
+matrix<T>::matrix(){
+	mat = nullptr;
+	dim = 0;
+}
+
+template <typename T>
+void matrix<T>::setter(int N){
+	dim = N;
+	delete mat;
+	mat = new T[dim*dim];
+	for(int i=0; i<(dim*dim); ++i){
+		mat[i] = 0;
+	}
+}
 
 template <typename T>
 T& matrix<T>::operator()(int &m, int &n){
