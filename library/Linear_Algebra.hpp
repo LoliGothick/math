@@ -27,7 +27,7 @@ public:
 	vector<T> operator-(const vector<T>&);
 
 	void operator=(const vector<T>&);
-	void operator=(const T &);
+	void operator=(const T);
 	void operator+=(const vector<T>&);
 	void operator-=(const vector<T>&);
 
@@ -38,7 +38,7 @@ public:
 };
 
 template <typename T>
-void vector<T>::operator=(const T &s){
+void vector<T>::operator=(const T s){
 	for(int i=0; i<dim; ++i){
 		vec[i] = s;
 	}
