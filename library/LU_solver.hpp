@@ -10,20 +10,20 @@ namespace LA{
 template <typename T>
 class matrix_LU{
 public:
-	LA::matrix<T> *L;
-	LA::matrix<T> *U;
+	matrix<T> *L;
+	matrix<T> *U;
 
 	int dim;
 
-	matrix_LU(int);
+	//matrix_LU(int);
 	matrix_LU(matrix<T> &);
 	~matrix_LU();
 
 	//void LU_decomposition(matrix<T> &);
 
-	void solve_linear_eq(vector<T> &, vector<T> &);
+	//void solve_linear_eq(vector<T> &, vector<T> &);
 };
-
+/*
 template <typename T>
 void matrix_LU<T>::solve_linear_eq(vector<T> &b, vector<T> &x){
 
@@ -44,6 +44,8 @@ void matrix_LU<T>::solve_linear_eq(vector<T> &b, vector<T> &x){
 		}
 	}
 }
+*/
+
 /*
 template <typename T>
 void matrix_LU<T>::LU_decomposition(matrix<T> &A){
@@ -79,13 +81,14 @@ void matrix_LU<T>::LU_decomposition(matrix<T> &A){
 	}
 }
 */
+/*
 template <typename T>
 matrix_LU<T>::matrix_LU(int N){
 	dim = N;
 	L = new matrix<T>(dim);
 	U = new matrix<T>(dim);
 }
-
+*/
 template <typename T>
 matrix_LU<T>::matrix_LU(matrix<T> &A){
 	dim = A.dim;
@@ -95,14 +98,11 @@ matrix_LU<T>::matrix_LU(matrix<T> &A){
 	/* LU decomposition*/
 
 	T sum = 0.;
-/*
-	double a = U->(0,0);
-
 
 	for(int i=0; i<dim; ++i){
 		U(i,i) = 1.;
 	}
-
+/*
 	for(int j=0; j<dim; j++){
 		for(int i=j; i<dim; i++){
 			sum = 0.;
