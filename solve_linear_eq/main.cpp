@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const int dim = 512;
+const int dim = 1000;
 
 int main(){
 

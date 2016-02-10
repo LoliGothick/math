@@ -1,6 +1,6 @@
 CXX = g++
 TARGET = a
-CXXFLAGS = -std=c++14 -Wall -Wextra
+CXXFLAGS = -std=c++14 -Wall -Wextra -O3
 SRCS = main.cpp
 OBJS :=$(SRCS:.cpp=.o)
 
