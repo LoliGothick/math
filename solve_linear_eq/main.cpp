@@ -1,6 +1,6 @@
 #include <iostream>
-#include "Linear_Algebra.hpp"
-#include "LU_solver.hpp"
+#include "../library/Linear_Algebra.hpp"
+#include "../library/LU_solver.hpp"
 
 using namespace std;
 
