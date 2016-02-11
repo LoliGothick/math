@@ -7,7 +7,7 @@ namespace mp = boost::multiprecision;
 
 using namespace std;
 
-const int dim = 2000;
+const int dim = 200;
 
 #define TYPE double //mp::cpp_dec_float_100
 
