@@ -110,7 +110,9 @@ T& vector<T>::operator()(const int i){
 
 template <typename T>
 void vector<T>::show(){
-	cout << fixed << setprecision(15);
+	cout << fixed << setprecision(100);
+	//cout << numeric_limits<decltype(vec[0])>::digits10 + 1 << endl;
+	//cout << fixed << setprecision(numeric_limits<decltype(vec[0])>::digits10 + 1) << endl;
 	for(int i=0; i<dim; ++i){
 		cout << vec[i] << endl;
 	}

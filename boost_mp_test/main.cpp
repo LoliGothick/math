@@ -1,21 +1,30 @@
 #include <iostream>
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#include "../library/Linear_Algebra.hpp"
+
+using namespace std;
 
 namespace mp = boost::multiprecision;
+using namespace mp;
+
+typedef mp::cpp_dec_float_100 f100;
+
+const int dim = 10;
 
 int main()
 {
-	mp::cpp_dec_float_100 x = 2.0f;
-	mp::cpp_dec_float_100 y;
+	f100 x("0.1");
+	f100 y;
 
-	mp::cpp_dec_float_100 result = mp::sqrt(x);
+	LA::vector<f100> b(dim);
 
-	y = result;
+	y = x;
 
-	std::cout << y << std::endl;
+	b = y;
+	b.show();
 
-	std::cout << std::setprecision(std::numeric_limits<decltype(x)>::digits10 + 1)
-			<< result;
+	//cout << setprecision(numeric_limits<decltype(x)>::digits10 + 1) << endl;
+	//cout << numeric_limits<decltype(x)>::digits10 << endl;
 
 	return 0;
 }
