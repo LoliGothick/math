@@ -24,7 +24,7 @@ int main(){
 
 	LA::vector<double> b(dim);
 
-	b = 1.0;
+	b = (double)1.0;
 
 	for(size_t i=0; ; ++i){
 		LA::RK_solver<double>(b, func, dt);
