@@ -100,7 +100,7 @@ vector<T>::vector(const int N){
 template <typename T>
 vector<T>::~vector(){
 	//cout << "memory free" << endl;
-	cout << __LINE__ << " " << vec << endl;
+	//cout << __LINE__ << " " << vec << endl;
 	delete[] vec;
 }
 
