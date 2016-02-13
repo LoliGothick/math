@@ -1,7 +1,6 @@
 #include <iostream>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include "../library/Linear_Algebra.hpp"
-#include "../library/LU_solver.hpp"
 #include "../library/ODE_solver.hpp"
 
 using namespace std;
