@@ -100,6 +100,7 @@ vector<T>::vector(const int N){
 template <typename T>
 vector<T>::~vector(){
 	//cout << "memory free" << endl;
+	cout << __LINE__ << " " << vec << endl;
 	delete[] vec;
 }
 
@@ -110,8 +111,9 @@ T& vector<T>::operator()(const int i){
 
 template <typename T>
 void vector<T>::show(){
-	cout << fixed << setprecision(100);
+	//cout << fixed << setprecision(100);
 	//cout << numeric_limits<decltype(T)>::digits10 + 1 << endl;
+	//cout << fixed << setprecision(numeric_limits<T>::digits10 + 1) << endl;
 	//cout << fixed << setprecision(numeric_limits<decltype(T)>::digits10 + 1) << endl;
 	for(int i=0; i<dim; ++i){
 		cout << vec[i] << endl;
