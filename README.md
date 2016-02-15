@@ -1,6 +1,5 @@
 # Linear_Algebra
 
-linear algebra
+linear algebra and ODE solver
 
-
-C++
+C++ / Boost

@@ -23,17 +23,18 @@ LA::vector<T> func(const LA::vector<T> &b){
 
 int main(){
 
-	const TYPE dt = math::ratio<TYPE>(1.0, 1000);
+	const TYPE dt = math::ratio<TYPE>(1.0, 10000);
 	TYPE t = math::ratio<TYPE>(0.0, 1.0);
 
 	LA::vector<TYPE> x(dim);
 
 	x = math::ratio<TYPE>(1.0, 1.0);
 
-	for(size_t i=0; t<100; ++i){
+	for(size_t i=0; t<10; ++i){
 		t = i*dt;
 		//cout << t << " ";
-		//x.show();
+		//cout << fixed << setprecision(numeric_limits<TYPE>::digits10 + 1);
+		//cout << x.vec[0] - exp(-t) << endl;;
 		LA::RK_solver<TYPE>(x, func, dt);
 	}
 
