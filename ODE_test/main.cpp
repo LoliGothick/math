@@ -17,7 +17,6 @@ const int dim = 1;
 template <typename T>
 LA::vector<T> func(const LA::vector<T> &b){
 	LA::vector<T> ans(b.dim);
-	//ans = - math::ratio<T>(1.0, 1.0) * b;
 	ans = math::ratio<T>(-1.0, 1.0) * b;
 	return ans;
 }

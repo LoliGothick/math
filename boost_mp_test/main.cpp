@@ -40,7 +40,7 @@ int main()
 	x.show();
 
 	//cout << setprecision(numeric_limits<decltype(x)>::digits10 ) << endl;
-	cout << numeric_limits<decltype(a)>::digits10 << endl;
+	//cout << numeric_limits<decltype(a)>::digits10 << endl;
 
 	return 0;
 }
