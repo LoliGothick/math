@@ -50,6 +50,8 @@ LA::vector<T> func(const LA::vector<T> &u){
 		flag++;
 	}
 
+	//iroiro keisann suru
+
 	ans = u;
 	return ans;
 }
