@@ -118,7 +118,7 @@ void vector<T>::show(){
 	for(int i=0; i<dim; ++i){
 		cout << vec[i] << endl;
 	}
-	//cout << endl;
+	cout << endl;
 }
 
 template <typename T>
