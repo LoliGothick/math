@@ -17,25 +17,25 @@ const int dim = 1;
 template <typename T>
 LA::vector<T> func(const LA::vector<T> &b){
 	LA::vector<T> ans(b.dim);
-	ans = math::ratio<T>(-1.0, 1.0) * b;
+	ans = math::ratio<T>(-1, 1) * b;
 	return ans;
 }
 
 int main(){
 
-	const TYPE dt = math::ratio<TYPE>(1.0, 10000);
+	const TYPE dt = math::ratio<TYPE>(1.0, 1000);
 	TYPE t = math::ratio<TYPE>(0.0, 1.0);
 
 	LA::vector<TYPE> x(dim);
 
 	x = math::ratio<TYPE>(1.0, 1.0);
 
-	for(size_t i=0; t<10; ++i){
+	for(size_t i=0;t<10 ; ++i){
 		t = i*dt;
 		//cout << t << " ";
-		//cout << fixed << setprecision(numeric_limits<TYPE>::digits10 + 1);
-		//cout << x.vec[0] - exp(-t) << endl;;
-		LA::RK_solver<TYPE>(x, func, dt);
+		cout << fixed << setprecision(numeric_limits<TYPE>::digits10 + 1);
+		cout << x.vec[0] << endl;;
+		LA::RK4<TYPE>(x, func, dt);
 	}
 
 	return 0;

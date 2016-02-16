@@ -8,13 +8,13 @@ using namespace std;
 namespace LA{
 
 template <typename T>
-void RK_solver(vector<T> &vec, vector<T> (*func)(const vector<T> &), const T &dt){
+void RK4(vector<T> &vec, vector<T> (*func)(const vector<T> &), const T &dt){
 
 	size_t dim = vec.dim;
 
-	static T r1_2 = math::ratio<T>(1.0, 2.0);
-	static T r1_6 = math::ratio<T>(1.0, 6.0);
-	static T r2_1 = math::ratio<T>(2.0, 1.0);
+	static T r1_2 = math::ratio<T>(1, 2);
+	static T r1_6 = math::ratio<T>(1, 6);
+	static T r2_1 = math::ratio<T>(2, 1);
 
 	vector<T> k1(dim);
 	vector<T> k2(dim);
