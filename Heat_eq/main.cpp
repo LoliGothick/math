@@ -20,11 +20,11 @@ typedef mp::cpp_dec_float_100 f100;
 
 #define TYPE f100
 
-const int INTV = 100;
+const int INTV = 1;
 
-const int dim = 100;
+const int dim = 50;
 const TYPE dx = math::ratio<TYPE>(1, dim + 1);
-const TYPE dt = math::ratio<TYPE>(1, 100000);
+const TYPE dt = math::ratio<TYPE>(1, 10000);
 //const TYPE PI = acos(-1.0);       // NG
 const TYPE PI = acos((TYPE)-1.0);   // OK
 
@@ -55,8 +55,8 @@ LA::vector<T> func(const LA::vector<T> &u){
 		}
 		flag++;
 	}
-
-	LA::matrix_LU<T> LU(M);
+	
+	static LA::matrix_LU<T> LU(M);
 
 	b = K * b;
 
@@ -91,10 +91,9 @@ int main(){
 	//fprintf(gp, "set size square\n");
 	fprintf(gp, "set grid\n");
 	
-	for(int i=0; t<0.1; i++){
+	for(int i=0; t<0.04; i++){
 	//for(int i=0; i<10; i++){
-		t = i*dt;
-		
+		t = i*dt;	
 		
 		if(i%INTV == 0){
 			fprintf(gp, "plot '-' w l\n");
