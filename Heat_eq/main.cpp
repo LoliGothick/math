@@ -22,7 +22,7 @@ typedef mp::cpp_dec_float_100 f100;
 
 const int INTV = 1;
 
-const int dim = 50;
+const int dim = 100;
 const TYPE dx = math::ratio<TYPE>(1, dim + 1);
 const TYPE dt = math::ratio<TYPE>(1, 10000);
 //const TYPE PI = acos(-1.0);       // NG
