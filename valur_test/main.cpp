@@ -1,19 +1,42 @@
-#include <bits/stdc++.h>
+#include <iostream>
 
-template <typename T>
-T max(T&& a, T&& b){
-	return (a<b)?b:a;
+//lvalue = rvalue;
+
+class X{
+public:
+};
+
+int f(){
+	return 5;
 }
 
-template <typename... Ts, typename T>
-T maxa(T&& head, Ts&&... tail){
-	return max(std::forward<T>(head), max(std::forward<Ts>(tail)...));
+void f(X&){
+}
+
+void g(X const &){
 }
 
 int main(int argc, char* argv[]){
 
-	std::cout << maxa(1,2,3) << std::endl; //OK
-	//std::cout << maxa(1,2,3,4) << std::endl; // NG
+	int i=10;
+
+	i;	//lvalue sahennti
+	10;	//rvalue uhennti
+
+	int j = i;	// i uhennti kara sahennti
+
+	X x;
+
+	int();
+
+	x;	//lvalue
+	X();//rvalue
+
+	f();//rvalue
+
+	int&& a = 10;
+
+	std::cout << a << std::endl;
 
 	return 0;
 }

@@ -4,7 +4,6 @@
  *  x in [0,1]
  */
 
-
 #include <iostream>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include "../library/Linear_Algebra.hpp"
@@ -18,13 +17,14 @@ namespace mp = boost::multiprecision;
 using namespace mp;
 typedef mp::cpp_dec_float_100 f100;
 
-#define TYPE f100
+#define TYPE double
 
 const int INTV = 1;
 
 const int dim = 100;
 const TYPE dx = math::ratio<TYPE>(1, dim + 1);
-const TYPE dt = math::ratio<TYPE>(1, 10000);
+//const TYPE dt = math::ratio<TYPE>(1, 100000);
+const TYPE dt = math::ratio<TYPE>(1,6)*dx*dx;
 //const TYPE PI = acos(-1.0);       // NG
 const TYPE PI = acos((TYPE)-1.0);   // OK
 
