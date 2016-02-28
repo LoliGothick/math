@@ -1,5 +1,5 @@
 # Linear_Algebra
 
-linear algebra and ODE solver
+math library
 
 C++ / Boost
