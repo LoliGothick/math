@@ -1,15 +1,15 @@
 /*
- *  soleve Heat Equation
- *	periodic
+ *  Heat Equation solover
+ *
  *  x in [0,1]
  */
 
 #include <iostream>
 #include <boost/multiprecision/cpp_dec_float.hpp>
-#include "../library/Linear_Algebra.hpp"
-#include "../library/LU_solver.hpp"
-#include "../library/ODE_solver.hpp"
-#include "../library/ratio.hpp"
+#include "../../library/Linear_Algebra.hpp"
+#include "../../library/LU_solver.hpp"
+#include "../../library/ODE_solver.hpp"
+#include "../../library/ratio.hpp"
 
 using namespace std;
 
@@ -22,9 +22,9 @@ typedef mp::cpp_dec_float_100 f100;
 const int INTV = 1;
 
 const int dim = 100;
-const TYPE dx = math::ratio<TYPE>(1, dim - 1);
-const TYPE dt = math::ratio<TYPE>(1, 100000);
-//const TYPE dt = math::ratio<TYPE>(1,6)*dx*dx;
+const TYPE dx = math::ratio<TYPE>(1, dim + 1);
+//const TYPE dt = math::ratio<TYPE>(1, 100000);
+const TYPE dt = math::ratio<TYPE>(1,6)*dx*dx;
 //const TYPE PI = acos(-1.0);       // NG
 const TYPE PI = acos((TYPE)-1.0);   // OK
 
@@ -51,10 +51,6 @@ LA::vector<T> func(const LA::vector<T> &u){
 					M(i,j) = math::ratio<T>( 1, 6) * dx;
 					K(i,j) = math::ratio<T>(-1, 1) / dx;
 				}
-				if((i == 0 && j == dim-1) || (i == dim-1 && j == 0)){
-					M(i,j) = math::ratio<T>(1, 6) * dx;
-					K(i,j) = math::ratio<T>(-1, 1) / dx;
-				}
 			}
 		}
 		flag++;
@@ -73,10 +69,8 @@ LA::vector<T> func(const LA::vector<T> &u){
 
 template <typename T>
 void init(LA::vector<T> &u){
-	T a = 0.2;
 	for(int i=0; i<u.dim; i++){
-		//u(i) = sin(PI*i*dx);
-		u(i) = exp(-100*(dx*i-a)*(dx*i-a));
+		u(i) = sin(PI*(i+1)*dx);
 	}
 }
 
@@ -97,13 +91,14 @@ int main(){
 	//fprintf(gp, "set size square\n");
 	fprintf(gp, "set grid\n");
 	
-	for(int i=0; t<0.1; i++){
-	//for(int i=0; i<2; i++){
+	for(int i=0; t<0.04; i++){
+	//for(int i=0; i<10; i++){
 		t = i*dt;	
 		
 		if(i%INTV == 0){
-			x = 0.;
 			fprintf(gp, "plot '-' w l\n");
+			fprintf(gp, "0 0\n");
+			x = dx;
 			for(int j=0; j<dim; j++){
 				double a = static_cast<double>(x);
 				double b = static_cast<double>(u(j));
@@ -112,6 +107,7 @@ int main(){
 				//fprintf(gp, "\n");
 				x += dx;
 			}
+			fprintf(gp, "1 0\n");
 			fprintf(gp, "e\n");
 			fflush(gp);
 		}
