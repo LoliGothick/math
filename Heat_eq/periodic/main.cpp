@@ -17,8 +17,8 @@ namespace mp = boost::multiprecision;
 using namespace mp;
 typedef mp::cpp_dec_float_100 f100;
 
+//#define TYPE double
 #define TYPE double
-//#define TYPE f100
 
 static constexpr int INTV = 1;
 
@@ -28,6 +28,7 @@ const TYPE dx = math::ratio<TYPE>(1, dim - 1);
 const TYPE dt = math::ratio<TYPE>(1,6)*dx*dx;
 //const TYPE PI = acos(-1.0);       // NG
 const TYPE PI = acos(static_cast<TYPE>(-1.0));   // OK
+const TYPE k  = math::ratio<TYPE>(20,1);
 
 template <typename T>
 LA::vector<T> func(const LA::vector<T> &u){
@@ -67,7 +68,7 @@ LA::vector<T> func(const LA::vector<T> &u){
 
 	LU.solve_linear_eq(b, x);
 
-	x = math::ratio<T>(-1, 1) * x;
+	x = math::ratio<T>(-1, 1) * x - k * u;
 
 	return x;
 }
