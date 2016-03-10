@@ -67,7 +67,8 @@ LA::vector<T> func(const LA::vector<T> &u){
 	b = K * b;
 
 	LU.solve_linear_eq(b, x);
-
+	
+	//reaction -ku
 	x = math::ratio<T>(-1, 1) * x - k * u;
 
 	return x;
@@ -121,13 +122,13 @@ int main(){
 		//cout << endl;
 		
 		LA::RK4(u, func, dt);
-	
+		/*	
 		TYPE sum = static_cast<TYPE>(0.);
 		for(int i=0; i<dim; ++i){
 			sum += u(i)*dx;
 		}
 		cout << sum << endl;
-	
+		*/
 	//	u.show();
 	}
 
