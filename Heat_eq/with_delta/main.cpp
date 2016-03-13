@@ -22,7 +22,7 @@ typedef mp::cpp_dec_float_100 f100;
 
 static constexpr int INTV = 100;
 
-const int dim = 128;
+const int dim = 1024;
 const TYPE dx = math::ratio<TYPE>(1, dim - 1);
 //const TYPE dt = math::ratio<TYPE>(1, 100000);
 const TYPE dt = math::ratio<TYPE>(1,6)*dx*dx;
@@ -31,12 +31,26 @@ const TYPE PI = acos(static_cast<TYPE>(-1.0));   // OK
 const TYPE k  = math::ratio<TYPE>(10,1);
 
 template <typename T>
+T delta_func(int i,T x){
+	if((i-1)*dx < x && x < (i+1)*dx){
+		return 1. - abs(x - i*dx)/dx;
+	}else{
+		return 0;
+	}
+	cout << "ERROR 32522" << endl;
+	return -1;
+}
+
+template <typename T>
 LA::vector<T> func(const LA::vector<T> &u){
 	static int flag = 0;
 	int dim = u.dim;
 
 	LA::vector<T> b(dim);
 	LA::vector<T> x(dim);
+	LA::vector<T> delta1(dim);
+	LA::vector<T> delta2(dim);
+	LA::vector<T> delta3(dim);
 	LA::vector<T> delta(dim);
 	b = u;
 
@@ -68,9 +82,21 @@ LA::vector<T> func(const LA::vector<T> &u){
 	b = K * b;
 
 	LU.solve_linear_eq(b, x);
-	
-	delta(dim/2) = static_cast<TYPE>(100.);
+
+	T delta_x1 = math::ratio<T>(1, 3);
+	T delta_x2 = math::ratio<T>(1, 2);
+	T delta_x3 = math::ratio<T>(3, 4);
+
+	//delta(dim/2) = static_cast<TYPE>(100.);
 	//delta(dim/3) = static_cast<TYPE>(50.);
+
+	for(int i=0; i<dim; ++i){
+		delta1(i) = math::ratio(50, 1) * delta_func<T>(i, delta_x1);
+		delta2(i) = math::ratio(50, 1) * delta_func<T>(i, delta_x2);
+		delta3(i) = math::ratio(100, 1) * delta_func<T>(i, delta_x3);
+	}
+
+	delta = delta1 + delta2 + delta3;
 
 	//reaction -ku and delta function
 	x = math::ratio<T>(-1, 1) * x - k * u + delta;
@@ -111,7 +137,7 @@ int main(){
 		
 		if(i%INTV == 0){
 			x = 0.;
-			fprintf(gp, "plot '-' w l lw 3\n");
+			fprintf(gp, "plot '-' w l lw 1\n");
 			for(int j=0; j<dim; j++){
 				double a = static_cast<double>(x);
 				double b = static_cast<double>(u(j));
