@@ -20,9 +20,9 @@ typedef mp::cpp_dec_float_100 f100;
 //#define TYPE double
 #define TYPE double
 
-static constexpr int INTV = 100;
+static constexpr int INTV = 1;
 
-const int dim = 1024;
+const int dim = 512;
 const TYPE dx = math::ratio<TYPE>(1, dim - 1);
 //const TYPE dt = math::ratio<TYPE>(1, 100000);
 const TYPE dt = math::ratio<TYPE>(1,6)*dx*dx;
@@ -83,9 +83,9 @@ LA::vector<T> func(const LA::vector<T> &u){
 
 	LU.solve_linear_eq(b, x);
 
-	T delta_x1 = math::ratio<T>(1, 3);
-	T delta_x2 = math::ratio<T>(1, 2);
-	T delta_x3 = math::ratio<T>(3, 4);
+	T delta_x1 = math::ratio<T>(4, 10);
+	T delta_x2 = math::ratio<T>(5, 10);
+	T delta_x3 = math::ratio<T>(8, 10);
 
 	//delta(dim/2) = static_cast<TYPE>(100.);
 	//delta(dim/3) = static_cast<TYPE>(50.);
@@ -106,10 +106,11 @@ LA::vector<T> func(const LA::vector<T> &u){
 
 template <typename T>
 void init(LA::vector<T> &u){
-	T a = 0.2;
+	//T a = 0.2;
 	for(int i=0; i<u.dim; i++){
 		//u(i) = sin(PI*i*dx);
-		u(i) = exp(-100*(dx*i-a)*(dx*i-a));
+		//u(i) = exp(-100*(dx*i-a)*(dx*i-a));
+		u(i) = 0.;
 	}
 }
 
