@@ -20,9 +20,9 @@ typedef mp::cpp_dec_float_100 f100;
 //#define TYPE double
 #define TYPE double
 
-static constexpr int INTV = 1;
+static constexpr int INTV = 10;
 
-const int dim = 512;
+const int dim = 414;
 const TYPE dx = math::ratio<TYPE>(1, dim - 1);
 //const TYPE dt = math::ratio<TYPE>(1, 100000);
 const TYPE dt = math::ratio<TYPE>(1,6)*dx*dx;
@@ -48,6 +48,7 @@ LA::vector<T> func(const LA::vector<T> &u){
 
 	LA::vector<T> b(dim);
 	LA::vector<T> x(dim);
+	LA::vector<T> y(dim);
 	LA::vector<T> delta1(dim);
 	LA::vector<T> delta2(dim);
 	LA::vector<T> delta3(dim);
@@ -91,15 +92,17 @@ LA::vector<T> func(const LA::vector<T> &u){
 	//delta(dim/3) = static_cast<TYPE>(50.);
 
 	for(int i=0; i<dim; ++i){
-		delta1(i) = math::ratio(50, 1) * delta_func<T>(i, delta_x1);
-		delta2(i) = math::ratio(50, 1) * delta_func<T>(i, delta_x2);
-		delta3(i) = math::ratio(100, 1) * delta_func<T>(i, delta_x3);
+		delta1(i) = math::ratio(1, 1) * delta_func<T>(i, delta_x1);
+		delta2(i) = math::ratio(1, 1) * delta_func<T>(i, delta_x2);
+		delta3(i) = math::ratio(2, 1) * delta_func<T>(i, delta_x3);
 	}
 
 	delta = delta1 + delta2 + delta3;
+	
+	LU.solve_linear_eq(delta, y);
 
 	//reaction -ku and delta function
-	x = math::ratio<T>(-1, 1) * x - k * u + delta;
+	x = math::ratio<T>(-1, 1) * x - k * u + y;
 
 	return x;
 }
