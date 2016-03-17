@@ -59,8 +59,8 @@ LA::vector<T> func(const LA::vector<T> &u){
 	static LA::matrix<TYPE> K(dim);
 	
 	if(flag == 0){
-		for(int i=0; i<dim; i++){
-			for(int j=0; j<dim; j++){
+		for(auto i=0; i<dim; i++){
+			for(auto j=0; j<dim; j++){
 				if(i == j){
 					M(i,j) = math::ratio<T>(2, 3) * dx;
 					K(i,j) = math::ratio<T>(2, 1) / dx;
@@ -84,14 +84,31 @@ LA::vector<T> func(const LA::vector<T> &u){
 
 	LU.solve_linear_eq(b, x);
 
-	T delta_x1 = math::ratio<T>(4, 10);
-	T delta_x2 = math::ratio<T>(5, 10);
-	T delta_x3 = math::ratio<T>(8, 10);
+	static T delta_x1 = math::ratio<T>(4, 10);
+	static T delta_x2 = math::ratio<T>(5, 10);
+	static T delta_x3 = math::ratio<T>(6, 10);
+
+	if(delta_x3 > 1){
+		delta_x3 = delta_x3 - 1;
+	}else if(delta_x3 < 0){
+		delta_x3 = delta_x3 + 1;
+	}
+	//delta_x3 += 0.0001;
+
+	int xx = delta_x3/dx;
+	cout << xx << endl;
+
+	T left  = (u.vec[xx] - u.vec[xx-1])/dx;
+	T right = (u.vec[xx+2] - u.vec[xx+1])/dx;
+
+	delta_x3 += - 0.1*dx * (left + right);
+
+	//cout << left << " " << right << endl;
 
 	//delta(dim/2) = static_cast<TYPE>(100.);
 	//delta(dim/3) = static_cast<TYPE>(50.);
 
-	for(int i=0; i<dim; ++i){
+	for(auto i=0; i<dim; ++i){
 		delta1(i) = math::ratio(1, 1) * delta_func<T>(i, delta_x1);
 		delta2(i) = math::ratio(1, 1) * delta_func<T>(i, delta_x2);
 		delta3(i) = math::ratio(2, 1) * delta_func<T>(i, delta_x3);
@@ -110,7 +127,7 @@ LA::vector<T> func(const LA::vector<T> &u){
 template <typename T>
 void init(LA::vector<T> &u){
 	//T a = 0.2;
-	for(int i=0; i<u.dim; i++){
+	for(auto i=0; i<u.dim; i++){
 		//u(i) = sin(PI*i*dx);
 		//u(i) = exp(-100*(dx*i-a)*(dx*i-a));
 		u(i) = 0.;
@@ -135,7 +152,7 @@ int main(){
 	fprintf(gp, "set grid\n");
 	
 	
-	for(int i=0; t<100; i++){
+	for(auto i=0; t<100; i++){
 	//for(int i=0; i<2; i++){
 		t = i*dt;	
 		
