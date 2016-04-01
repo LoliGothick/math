@@ -22,7 +22,7 @@ typedef mp::cpp_dec_float_100 f100;
 
 static constexpr int INTV = 10;
 
-const int dim = 414;
+const int dim = 415;
 const TYPE dx = math::ratio<TYPE>(1, dim - 1);
 //const TYPE dt = math::ratio<TYPE>(1, 100000);
 const TYPE dt = math::ratio<TYPE>(1,6)*dx*dx;
@@ -97,11 +97,15 @@ LA::vector<T> func(const LA::vector<T> &u){
 
 	int xx = delta_x3/dx;
 	cout << xx << endl;
-
+/*
 	T left  = (u.vec[xx] - u.vec[xx-1])/dx;
 	T right = (u.vec[xx+2] - u.vec[xx+1])/dx;
+*/
+	T diff = (u.vec[xx+1] - u.vec[xx])/dx;
 
-	delta_x3 += - 0.1*dx * (left + right);
+	cout << diff << endl;
+
+	delta_x3 += - dx * diff;
 
 	//cout << left << " " << right << endl;
 
