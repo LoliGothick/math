@@ -18,11 +18,11 @@ using namespace mp;
 typedef mp::cpp_dec_float_100 f100;
 
 //#define TYPE double
-#define TYPE double
+#define TYPE f100
 
-static constexpr int INTV = 10;
+static constexpr int INTV = 67;
 
-const int dim = 415;
+const int dim = 41;
 const TYPE dx = math::ratio<TYPE>(1, dim - 1);
 //const TYPE dt = math::ratio<TYPE>(1, 100000);
 const TYPE dt = math::ratio<TYPE>(1,6)*dx*dx;
@@ -95,27 +95,24 @@ LA::vector<T> func(const LA::vector<T> &u){
 	}
 	//delta_x3 += 0.0001;
 
-	int xx = delta_x3/dx;
-	cout << xx << endl;
-/*
-	T left  = (u.vec[xx] - u.vec[xx-1])/dx;
-	T right = (u.vec[xx+2] - u.vec[xx+1])/dx;
-*/
-	T diff = (u.vec[xx+1] - u.vec[xx])/dx;
+	int left = static_cast<int>(delta_x3/dx);
+	
+	T diff = (u.vec[left+1] - u.vec[left])/dx;
 
-	cout << diff << endl;
+	//cout << diff << endl;
 
 	delta_x3 += - dx * diff;
 
-	//cout << left << " " << right << endl;
+	if(delta_x3 > 1.){
+		delta_x3 -= 1.;
+	}
 
-	//delta(dim/2) = static_cast<TYPE>(100.);
-	//delta(dim/3) = static_cast<TYPE>(50.);
+	cout << delta_x3 << endl;
 
 	for(auto i=0; i<dim; ++i){
-		delta1(i) = math::ratio(1, 1) * delta_func<T>(i, delta_x1);
-		delta2(i) = math::ratio(1, 1) * delta_func<T>(i, delta_x2);
-		delta3(i) = math::ratio(2, 1) * delta_func<T>(i, delta_x3);
+		delta1(i) = 0;//math::ratio(1, 1) * delta_func<T>(i, delta_x1);
+		delta2(i) = 0;//math::ratio(1, 1) * delta_func<T>(i, delta_x2);
+		delta3(i) = math::ratio(1, 1) * delta_func<T>(i, delta_x3);
 	}
 
 	delta = delta1 + delta2 + delta3;
@@ -130,11 +127,11 @@ LA::vector<T> func(const LA::vector<T> &u){
 
 template <typename T>
 void init(LA::vector<T> &u){
-	//T a = 0.2;
+	T a = 0.5;
 	for(auto i=0; i<u.dim; i++){
 		//u(i) = sin(PI*i*dx);
-		//u(i) = exp(-100*(dx*i-a)*(dx*i-a));
-		u(i) = 0.;
+		u(i) = exp(-100*(dx*i-a)*(dx*i-a));
+		//u(i) = 0.;
 	}
 }
 
