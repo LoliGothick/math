@@ -106,7 +106,15 @@ vector<T>::~vector(){
 
 template <typename T>
 T& vector<T>::operator()(const int i){
-	return vec[i];
+	if(i>=0 && i<dim){
+		return vec[i];
+	}else if(i == -1){
+		return vec[dim-1];
+	}else if(i == dim){
+		return vec[0];
+	}else if(i == (dim + 1)){
+		return vec[1];
+	}
 }
 
 template <typename T>

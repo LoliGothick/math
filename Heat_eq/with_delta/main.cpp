@@ -17,12 +17,12 @@ namespace mp = boost::multiprecision;
 using namespace mp;
 typedef mp::cpp_dec_float_100 f100;
 
-//#define TYPE double
-#define TYPE f100
+#define TYPE double
+//#define TYPE f100
 
-static constexpr int INTV = 67;
+static constexpr int INTV = 3;
 
-const int dim = 41;
+const int dim = 157;
 const TYPE dx = math::ratio<TYPE>(1, dim - 1);
 //const TYPE dt = math::ratio<TYPE>(1, 100000);
 const TYPE dt = math::ratio<TYPE>(1,6)*dx*dx;
@@ -97,17 +97,10 @@ LA::vector<T> func(const LA::vector<T> &u){
 
 	int left = static_cast<int>(delta_x3/dx);
 	
-	T diff = (u.vec[left+1] - u.vec[left])/dx;
+	T diff = (u.vec[left+2] - u.vec[left-1])/(4*dx);
 
-	//cout << diff << endl;
 
-	delta_x3 += - dx * diff;
-
-	if(delta_x3 > 1.){
-		delta_x3 -= 1.;
-	}
-
-	cout << delta_x3 << endl;
+	//cout << delta_x3 << endl;
 
 	for(auto i=0; i<dim; ++i){
 		delta1(i) = 0;//math::ratio(1, 1) * delta_func<T>(i, delta_x1);
@@ -118,6 +111,13 @@ LA::vector<T> func(const LA::vector<T> &u){
 	delta = delta1 + delta2 + delta3;
 	
 	LU.solve_linear_eq(delta, y);
+	delta_x3 += - dx * diff;
+
+	if(delta_x3 > 1.){
+		delta_x3 -= 1.;
+	}else if(delta_x3<0){
+		delta_x3 += 1.;
+	}
 
 	//reaction -ku and delta function
 	x = math::ratio<T>(-1, 1) * x - k * u + y;
@@ -127,7 +127,7 @@ LA::vector<T> func(const LA::vector<T> &u){
 
 template <typename T>
 void init(LA::vector<T> &u){
-	T a = 0.5;
+	T a = 0.8;
 	for(auto i=0; i<u.dim; i++){
 		//u(i) = sin(PI*i*dx);
 		u(i) = exp(-100*(dx*i-a)*(dx*i-a));
