@@ -8,9 +8,9 @@ using namespace std;
 namespace LA{
 
 template <typename T>
-void RK4(vector<T> &vec, vector<T> (*func)(const vector<T> &), const T &dt){
+void RK4(vector<T> &vec, vector<T> (*func)(vector<T> const &), const T &dt){
 
-	size_t dim = vec.dim;
+	auto dim = vec.dim;
 
 	static T r1_2 = math::ratio<T>(1, 2);
 	static T r1_6 = math::ratio<T>(1, 6);
@@ -28,6 +28,7 @@ void RK4(vector<T> &vec, vector<T> (*func)(const vector<T> &), const T &dt){
 
 	vec = vec + r1_6 * (dt * (k1 + r2_1 * k2 + r2_1 * k3 + k4));
 }
+
 /*
 template <typename T>
 void RK4(vector<T> &vec, vector<T> (*func)(vector<T> &), const T &dt){

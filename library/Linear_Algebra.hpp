@@ -21,7 +21,7 @@ public:
 	vector(const int);
 	~vector();
 	
-	T& operator()(const int);
+	T& operator()(int);
 	
 	vector<T> operator+(const vector<T>&);
 	vector<T> operator-(const vector<T>&);
@@ -105,7 +105,9 @@ vector<T>::~vector(){
 }
 
 template <typename T>
-T& vector<T>::operator()(const int i){
+T& vector<T>::operator()(int i){
+	return vec[(i+dim)%dim];
+/*
 	if(i>=0 && i<dim){
 		return vec[i];
 	}else if(i == -1){
@@ -115,6 +117,7 @@ T& vector<T>::operator()(const int i){
 	}else if(i == (dim + 1)){
 		return vec[1];
 	}
+	*/
 }
 
 template <typename T>

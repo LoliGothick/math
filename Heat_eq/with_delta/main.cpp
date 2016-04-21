@@ -6,6 +6,8 @@
 
 #include <iostream>
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 #include "../../library/Linear_Algebra.hpp"
 #include "../../library/LU_solver.hpp"
 #include "../../library/ODE_solver.hpp"
@@ -42,7 +44,7 @@ T delta_func(int i,T x){
 }
 
 template <typename T>
-LA::vector<T> func(const LA::vector<T> &u){
+LA::vector<T> func(LA::vector<T> const &u){
 	static int flag = 0;
 	int dim = u.dim;
 
@@ -84,8 +86,8 @@ LA::vector<T> func(const LA::vector<T> &u){
 
 	LU.solve_linear_eq(b, x);
 
-	static T delta_x1 = math::ratio<T>(4, 10);
-	static T delta_x2 = math::ratio<T>(5, 10);
+	//static T delta_x1 = math::ratio<T>(4, 10);
+	//static T delta_x2 = math::ratio<T>(5, 10);
 	static T delta_x3 = math::ratio<T>(6, 10);
 
 	if(delta_x3 > 1){
@@ -96,8 +98,11 @@ LA::vector<T> func(const LA::vector<T> &u){
 	//delta_x3 += 0.0001;
 
 	int left = static_cast<int>(delta_x3/dx);
-	
-	T diff = (u.vec[left+2] - u.vec[left-1])/(4*dx);
+
+	cout << u.vec[left] << endl;
+	//cout << u(3) << endl;
+
+//	T diff = (u.vec[left+2] - u.vec[left-1])/(4*dx);
 
 
 	//cout << delta_x3 << endl;
@@ -111,6 +116,7 @@ LA::vector<T> func(const LA::vector<T> &u){
 	delta = delta1 + delta2 + delta3;
 	
 	LU.solve_linear_eq(delta, y);
+/*
 	delta_x3 += - dx * diff;
 
 	if(delta_x3 > 1.){
@@ -118,7 +124,7 @@ LA::vector<T> func(const LA::vector<T> &u){
 	}else if(delta_x3<0){
 		delta_x3 += 1.;
 	}
-
+*/
 	//reaction -ku and delta function
 	x = math::ratio<T>(-1, 1) * x - k * u + y;
 
@@ -153,7 +159,7 @@ int main(){
 	fprintf(gp, "set grid\n");
 	
 	
-	for(auto i=0; t<100; i++){
+	for(auto i=0; t<0.001; i++){
 	//for(int i=0; i<2; i++){
 		t = i*dt;	
 		
