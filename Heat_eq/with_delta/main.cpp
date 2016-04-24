@@ -5,7 +5,7 @@
  */
 
 #include <iostream>
-//#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/multiprecision/cpp_dec_float.hpp>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include "../../library/Linear_Algebra.hpp"
@@ -15,22 +15,22 @@
 
 using namespace std;
 
-//namespace mp = boost::multiprecision;
-//using namespace mp;
-//typedef mp::cpp_dec_float_100 f100;
+namespace mp = boost::multiprecision;
+using namespace mp;
+typedef mp::cpp_dec_float_100 f100;
 
 #define TYPE double
 //#define TYPE f100
 
-static constexpr int INTV = 11;
+static constexpr int INTV = 80;
 
-const int dim = 105;
+const int dim = 526;
 const TYPE dx = math::ratio<TYPE>(1, dim-1);
 //const TYPE dt = math::ratio<TYPE>(1, 100000);
-const TYPE dt = math::ratio<TYPE>(1,6)*dx*dx;
+const TYPE dt = 0.5*math::ratio<TYPE>(1,6)*dx*dx;
 //const TYPE PI = acos(-1.0);       // NG
 //const TYPE PI = acos(static_cast<TYPE>(-1.0));   // OK
-const TYPE k  = math::ratio<TYPE>(10,1);
+const TYPE k  = math::ratio<TYPE>(1,10);
 
 template <typename T>
 T delta_func(int i,T x){
@@ -77,10 +77,10 @@ LA::vector<T> func(LA::vector<T> const &u){
 				}
 			}
 		}
-		M(0, 0) = math::ratio<T>(2, 3) * dx;
-		K(0, 0) = math::ratio<T>(2, 1) / dx;
-		M(dim-1, dim-1) = math::ratio<T>(2, 3) * dx;
-		K(dim-1, dim-1) = math::ratio<T>(2, 1) / dx;
+		//M(0, 0) = 0.5*math::ratio<T>(2, 3) * dx;
+		//K(0, 0) = math::ratio<T>(2, 1) / dx;
+		//M(dim-1, dim-1) = 0.5*math::ratio<T>(2, 3) * dx;
+		//K(dim-1, dim-1) = math::ratio<T>(2, 1) / dx;
 		flag++;
 	}
 	
@@ -104,7 +104,7 @@ LA::vector<T> func(LA::vector<T> const &u){
 	int left  = (static_cast<int>(delta_x3/dx));
 	int right = (left+1)%dim;
 
-	cout << dim << " " << left << " " << right << endl; 
+	//cout << dim << " " << left << " " << right << endl; 
 
 /*
 	cout << dx*((left+dim)%dim)   << " " << u.vec[(left+dim)%dim]   << endl;
@@ -121,13 +121,15 @@ LA::vector<T> func(LA::vector<T> const &u){
 	A(0, 1) = xx;
 	A(0, 2) = 1.;
 	
-	T yy = dx*((left+dim-1)%dim);
+	//T yy = dx*((left+dim-1)%dim);
+	T yy = xx - dx;
 
 	A(1, 0) = yy*yy;
 	A(1, 1) = yy;
 	A(1, 2) = 1.;
 	
-	T zz = dx*((left+dim-2)%dim);
+	//T zz = dx*((left+dim-2)%dim);
+	T zz = yy - dx;
 
 	A(2, 0) = zz*zz;
 	A(2, 1) = zz;
@@ -172,13 +174,15 @@ LA::vector<T> func(LA::vector<T> const &u){
 	B(0, 1) = r_xx;
 	B(0, 2) = 1.;
 	
-	T r_yy = dx*((right+dim+1)%dim);
+	//T r_yy = dx*((right+dim+1)%dim);
+	T r_yy = r_xx + dx;
 
 	B(1, 0) = r_yy*r_yy;
 	B(1, 1) = r_yy;
 	B(1, 2) = 1.;
 	
-	T r_zz = dx*((right+dim+2)%dim);
+	//T r_zz = dx*((right+dim+2)%dim);
+	T r_zz = r_yy + dx;
 
 	B(2, 0) = r_zz*r_zz;
 	B(2, 1) = r_zz;
@@ -211,14 +215,16 @@ LA::vector<T> func(LA::vector<T> const &u){
 		return r_aaa*x*x + r_bbb*x + r_ccc;
 	};
 
-	cout << left_f(delta_x3) << endl;
-	cout << right_f(delta_x3) << endl;
+	//cout << left_f(delta_x3) << endl;
+	//cout << right_f(delta_x3) << endl;
 
 	T diff = (right_f(delta_x3+dx/2.) - left_f(delta_x3-dx/2.))/(dx);
 
-	cout << diff << endl;
+	//cout << diff << endl;
 
-	delta_x3 = delta_x3 - diff*dx;
+	T coef = math::ratio<T>(5,1000);
+
+	delta_x3 = delta_x3 - coef * diff * dx;
 	
 	if(delta_x3 >= 1){
 		delta_x3 = delta_x3 - 1.;
@@ -226,7 +232,7 @@ LA::vector<T> func(LA::vector<T> const &u){
 		delta_x3 = delta_x3 + 1.;
 	}
 
-	cout << "delta_x3 :" << delta_x3 << "\n";
+//	cout << "delta_x3 :" << delta_x3 << "\n";
 
 //	T diff = (u.vec[left+2] - u.vec[left-1])/(4*dx);
 
@@ -259,10 +265,10 @@ LA::vector<T> func(LA::vector<T> const &u){
 
 template <typename T>
 void init(LA::vector<T> &u){
-	T a = 0.1;
+	T a = 0.4;
 	for(auto i=0; i<u.dim; i++){
 		//u(i) = sin(PI*i*dx);
-		u(i) = 0.2*exp(-100*(dx*i-a)*(dx*i-a));
+		u(i) = 0.02*exp(-100*(dx*i-a)*(dx*i-a));
 		//u(i) = 0.;
 	}
 }
