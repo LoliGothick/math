@@ -177,7 +177,7 @@ public:
 
 	void setter(int);
 
-	T& operator()(int &, int &);
+	T& operator()(const int &, const int &);
 
 	void operator=(const matrix<T> &);
 	matrix<T> operator+(matrix<T> &);
@@ -203,7 +203,7 @@ void matrix<T>::setter(int N){
 }
 
 template <typename T>
-T& matrix<T>::operator()(int &m, int &n){
+T& matrix<T>::operator()(const int &m, const int &n){
 	return mat[n*dim + m];
 }
 

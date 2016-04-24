@@ -3,6 +3,7 @@
  *
  */
 
+#define BOOST_NO_CXX11_HDR_ARRAY
 #include <iostream>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <Eigen/Sparse>

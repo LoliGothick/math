@@ -5,7 +5,7 @@
  */
 
 #include <iostream>
-#include <boost/multiprecision/cpp_dec_float.hpp>
+//#include <boost/multiprecision/cpp_dec_float.hpp>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include "../../library/Linear_Algebra.hpp"
@@ -15,21 +15,21 @@
 
 using namespace std;
 
-namespace mp = boost::multiprecision;
-using namespace mp;
-typedef mp::cpp_dec_float_100 f100;
+//namespace mp = boost::multiprecision;
+//using namespace mp;
+//typedef mp::cpp_dec_float_100 f100;
 
 #define TYPE double
 //#define TYPE f100
 
-static constexpr int INTV = 3;
+static constexpr int INTV = 11;
 
-const int dim = 157;
-const TYPE dx = math::ratio<TYPE>(1, dim - 1);
+const int dim = 105;
+const TYPE dx = math::ratio<TYPE>(1, dim-1);
 //const TYPE dt = math::ratio<TYPE>(1, 100000);
 const TYPE dt = math::ratio<TYPE>(1,6)*dx*dx;
 //const TYPE PI = acos(-1.0);       // NG
-const TYPE PI = acos(static_cast<TYPE>(-1.0));   // OK
+//const TYPE PI = acos(static_cast<TYPE>(-1.0));   // OK
 const TYPE k  = math::ratio<TYPE>(10,1);
 
 template <typename T>
@@ -77,6 +77,10 @@ LA::vector<T> func(LA::vector<T> const &u){
 				}
 			}
 		}
+		M(0, 0) = math::ratio<T>(2, 3) * dx;
+		K(0, 0) = math::ratio<T>(2, 1) / dx;
+		M(dim-1, dim-1) = math::ratio<T>(2, 3) * dx;
+		K(dim-1, dim-1) = math::ratio<T>(2, 1) / dx;
 		flag++;
 	}
 	
@@ -88,19 +92,141 @@ LA::vector<T> func(LA::vector<T> const &u){
 
 	//static T delta_x1 = math::ratio<T>(4, 10);
 	//static T delta_x2 = math::ratio<T>(5, 10);
-	static T delta_x3 = math::ratio<T>(6, 10);
+	static T delta_x3 = math::ratio<T>(5, 10);
 
-	if(delta_x3 > 1){
-		delta_x3 = delta_x3 - 1;
+	if(delta_x3 >= 1){
+		delta_x3 = delta_x3 - 1.;
 	}else if(delta_x3 < 0){
-		delta_x3 = delta_x3 + 1;
+		delta_x3 = delta_x3 + 1.;
 	}
 	//delta_x3 += 0.0001;
 
-	int left = static_cast<int>(delta_x3/dx);
+	int left  = (static_cast<int>(delta_x3/dx));
+	int right = (left+1)%dim;
 
-	cout << u.vec[left] << endl;
-	//cout << u(3) << endl;
+	cout << dim << " " << left << " " << right << endl; 
+
+/*
+	cout << dx*((left+dim)%dim)   << " " << u.vec[(left+dim)%dim]   << endl;
+	cout << dx*((left+dim-1)%dim) << " " << u.vec[(left+dim-1)%dim] << endl;
+	cout << dx*((left+dim-2)%dim) << " " << u.vec[(left+dim-2)%dim] << endl;
+*/
+	/* make matrix */
+
+	Eigen::Matrix<T, 3, 3> A;
+	
+	T xx = dx*((left+dim)%dim);
+
+	A(0, 0) = xx*xx;
+	A(0, 1) = xx;
+	A(0, 2) = 1.;
+	
+	T yy = dx*((left+dim-1)%dim);
+
+	A(1, 0) = yy*yy;
+	A(1, 1) = yy;
+	A(1, 2) = 1.;
+	
+	T zz = dx*((left+dim-2)%dim);
+
+	A(2, 0) = zz*zz;
+	A(2, 1) = zz;
+	A(2, 2) = 1.;
+
+//	cout << A << endl;
+
+	/* make vector */
+	
+	Eigen::Matrix<T, 3, 1> bb;
+
+	bb(0, 0) = u.vec[(left+dim)%dim];
+	bb(1, 0) = u.vec[(left+dim-1)%dim];
+	bb(2, 0) = u.vec[(left+dim-2)%dim];
+
+//	cout << bb << endl;
+
+//	cout << A.inverse()*bb << endl;
+	Eigen::Matrix<T, 3, 1> co = A.inverse()*bb;
+
+//	cout << co << endl;
+	
+	T aaa = co(0, 0);
+	T bbb = co(1, 0);
+	T ccc = co(2, 0);
+
+	auto left_f = [&](T x){
+		return aaa*x*x + bbb*x + ccc;
+	};
+/*	
+	cout << dx*((right+dim)%dim)   << " " << u.vec[(right+dim)%dim]   << endl;
+	cout << dx*((right+dim+1)%dim) << " " << u.vec[(right+dim+1)%dim] << endl;
+	cout << dx*((right+dim+2)%dim) << " " << u.vec[(right+dim+2)%dim] << endl;
+*/
+	/* make matrix */
+
+	Eigen::Matrix<T, 3, 3> B;
+	
+	T r_xx = dx*((right+dim)%dim);
+
+	B(0, 0) = r_xx*r_xx;
+	B(0, 1) = r_xx;
+	B(0, 2) = 1.;
+	
+	T r_yy = dx*((right+dim+1)%dim);
+
+	B(1, 0) = r_yy*r_yy;
+	B(1, 1) = r_yy;
+	B(1, 2) = 1.;
+	
+	T r_zz = dx*((right+dim+2)%dim);
+
+	B(2, 0) = r_zz*r_zz;
+	B(2, 1) = r_zz;
+	B(2, 2) = 1.;
+
+//	cout << B << endl;
+
+	/* make vector */
+	
+	Eigen::Matrix<T, 3, 1> r_bb;
+
+	r_bb(0, 0) = u.vec[(right+dim)%dim];
+	r_bb(1, 0) = u.vec[(right+dim+1)%dim];
+	r_bb(2, 0) = u.vec[(right+dim+2)%dim];
+
+//	cout << r_bb << endl;
+
+//	cout << B.inverse()*r_bb << endl;
+	Eigen::Matrix<T, 3, 1> r_co = B.inverse()*r_bb;
+
+//	cout << r_co << endl;
+	
+	T r_aaa = r_co(0, 0);
+	T r_bbb = r_co(1, 0);
+	T r_ccc = r_co(2, 0);
+	//cout << co << endl;
+	//cout << r_co << endl;
+	
+	auto right_f = [&](T x){
+		return r_aaa*x*x + r_bbb*x + r_ccc;
+	};
+
+	cout << left_f(delta_x3) << endl;
+	cout << right_f(delta_x3) << endl;
+
+	T diff = (right_f(delta_x3+dx/2.) - left_f(delta_x3-dx/2.))/(dx);
+
+	cout << diff << endl;
+
+	delta_x3 = delta_x3 - diff*dx;
+	
+	if(delta_x3 >= 1){
+		delta_x3 = delta_x3 - 1.;
+	}else if(delta_x3 < 0){
+		delta_x3 = delta_x3 + 1.;
+	}
+
+	cout << "delta_x3 :" << delta_x3 << "\n";
 
 //	T diff = (u.vec[left+2] - u.vec[left-1])/(4*dx);
 
@@ -133,10 +259,10 @@ LA::vector<T> func(LA::vector<T> const &u){
 
 template <typename T>
 void init(LA::vector<T> &u){
-	T a = 0.8;
+	T a = 0.1;
 	for(auto i=0; i<u.dim; i++){
 		//u(i) = sin(PI*i*dx);
-		u(i) = exp(-100*(dx*i-a)*(dx*i-a));
+		u(i) = 0.2*exp(-100*(dx*i-a)*(dx*i-a));
 		//u(i) = 0.;
 	}
 }
@@ -159,7 +285,7 @@ int main(){
 	fprintf(gp, "set grid\n");
 	
 	
-	for(auto i=0; t<0.001; i++){
+	for(auto i=0; t<10.8; i++){
 	//for(int i=0; i<2; i++){
 		t = i*dt;	
 		
