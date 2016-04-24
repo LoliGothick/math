@@ -24,7 +24,7 @@ typedef mp::cpp_dec_float_100 f100;
 
 static constexpr int INTV = 80;
 
-const int dim = 526;
+const int dim = 266;
 const TYPE dx = math::ratio<TYPE>(1, dim-1);
 //const TYPE dt = math::ratio<TYPE>(1, 100000);
 const TYPE dt = 0.5*math::ratio<TYPE>(1,6)*dx*dx;
