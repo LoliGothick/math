@@ -24,13 +24,13 @@ typedef mp::cpp_dec_float_100 f100;
 
 static constexpr int INTV = 80;
 
-const int dim = 266;
+const int dim = 144;
 const TYPE dx = math::ratio<TYPE>(1, dim-1);
 //const TYPE dt = math::ratio<TYPE>(1, 100000);
 const TYPE dt = 0.5*math::ratio<TYPE>(1,6)*dx*dx;
 //const TYPE PI = acos(-1.0);       // NG
 //const TYPE PI = acos(static_cast<TYPE>(-1.0));   // OK
-const TYPE k  = math::ratio<TYPE>(1,10);
+const TYPE k  = math::ratio<TYPE>(1,1);
 
 template <typename T>
 T delta_func(int i,T x){
@@ -222,9 +222,9 @@ LA::vector<T> func(LA::vector<T> const &u){
 
 	//cout << diff << endl;
 
-	T coef = math::ratio<T>(5,1000);
+	T coef = math::ratio<T>(10,1);
 
-	delta_x3 = delta_x3 - coef * diff * dx;
+	delta_x3 = delta_x3 - coef * diff * dt;
 	
 	if(delta_x3 >= 1){
 		delta_x3 = delta_x3 - 1.;
@@ -268,7 +268,7 @@ void init(LA::vector<T> &u){
 	T a = 0.4;
 	for(auto i=0; i<u.dim; i++){
 		//u(i) = sin(PI*i*dx);
-		u(i) = 0.02*exp(-100*(dx*i-a)*(dx*i-a));
+		u(i) = 0.2*exp(-100*(dx*i-a)*(dx*i-a));
 		//u(i) = 0.;
 	}
 }
