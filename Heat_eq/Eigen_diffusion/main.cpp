@@ -18,17 +18,17 @@ namespace mp = boost::multiprecision;
 using namespace mp;
 typedef mp::cpp_dec_float_100 f100;
 
-#define TYPE double
-//#define TYPE f100
+//#define TYPE double
+#define TYPE f100
 
-static constexpr int INTV = 1;
+static constexpr int INTV = 59;
 
-const int dim = 128;
+const int dim = 160;
 const TYPE dx = math::ratio<TYPE>(1, dim);
-//const TYPE dt = math::ratio<TYPE>(1, 100000);
-const TYPE dt = math::ratio<TYPE>(1,6)*dx*dx;
+//const TYPE dt = math::ratio<TYPE>(1, 1000);
+const TYPE dt = math::ratio<TYPE>(1,6)*dx;
 //const TYPE PI = acos(static_cast<TYPE>(-1.0));
-const TYPE k  = math::ratio<TYPE>(1,1);
+const TYPE k  = math::ratio<TYPE>(1,1000);
 
 template <typename T>
 T phi_func(int i,T x){
@@ -51,8 +51,8 @@ void init(Eigen::Matrix<T, dim, 1> &u){
 }
 
 template <typename T>
-Eigen::Matrix<T, dim, 1> func(Eigen::SimplicialCholesky<Eigen::SparseMatrix<T> > &solver, Eigen::SparseMatrix<T> &K, Eigen::Matrix<T, dim, 1> &u){
-//Eigen::Matrix<T, dim, 1> func(Eigen::ConjugateGradient<Eigen::SparseMatrix<T> > &solver, Eigen::SparseMatrix<T> &K, Eigen::Matrix<T, dim, 1> &u){
+//Eigen::Matrix<T, dim, 1> func(Eigen::SimplicialCholesky<Eigen::SparseMatrix<T> > &solver, Eigen::SparseMatrix<T> &K, Eigen::Matrix<T, dim, 1> &u){
+Eigen::Matrix<T, dim, 1> func(auto &solver, Eigen::SparseMatrix<T> &K, Eigen::Matrix<T, dim, 1> &u){
 	return math::ratio<T>(-1, 1) * solver.solve(K * u) - k * u;
 }
 
@@ -77,21 +77,20 @@ int main(){
 	vector<Eigen::Triplet<TYPE> > K_coef;
 
 	for(auto i=0; i<dim; ++i){
-		M_coef.push_back(Eigen::Triplet<TYPE>(i, i, math::ratio<TYPE>(2, 3) * dx));
-		K_coef.push_back(Eigen::Triplet<TYPE>(i, i, math::ratio<TYPE>(2, 1) / dx));
+		//M_coef.push_back(Eigen::Triplet<TYPE>(i, i, static_cast<TYPE>(math::ratio<TYPE>(2, 3) * dx)));
+		//K_coef.push_back(Eigen::Triplet<TYPE>(i, i, static_cast<TYPE>(math::ratio<TYPE>(2, 1) / dx)));
+		M_coef.push_back(Eigen::Triplet<TYPE>(i, i, static_cast<TYPE>(math::ratio<TYPE>(2, 3))));
+		K_coef.push_back(Eigen::Triplet<TYPE>(i, i, static_cast<TYPE>(math::ratio<TYPE>(2, 1))));
+		
+		//M_coef.push_back(Eigen::Triplet<TYPE>(i, (i+1)%dim, static_cast<TYPE>(math::ratio<TYPE>( 1, 6) * dx)));
+		//M_coef.push_back(Eigen::Triplet<TYPE>((i+1)%dim, i, static_cast<TYPE>(math::ratio<TYPE>( 1, 6) * dx)));
+		//K_coef.push_back(Eigen::Triplet<TYPE>(i, (i+1)%dim, static_cast<TYPE>(math::ratio<TYPE>(-1, 1) / dx)));
+		//K_coef.push_back(Eigen::Triplet<TYPE>((i+1)%dim, i, static_cast<TYPE>(math::ratio<TYPE>(-1, 1) / dx)));
+		M_coef.push_back(Eigen::Triplet<TYPE>(i, (i+1)%dim, static_cast<TYPE>(math::ratio<TYPE>( 1, 6))));
+		M_coef.push_back(Eigen::Triplet<TYPE>((i+1)%dim, i, static_cast<TYPE>(math::ratio<TYPE>( 1, 6))));
+		K_coef.push_back(Eigen::Triplet<TYPE>(i, (i+1)%dim, static_cast<TYPE>(math::ratio<TYPE>(-1, 1))));
+		K_coef.push_back(Eigen::Triplet<TYPE>((i+1)%dim, i, static_cast<TYPE>(math::ratio<TYPE>(-1, 1))));
 	}
-
-	for(auto i=1; i<dim; ++i){
-		M_coef.push_back(Eigen::Triplet<TYPE>(i, i-1, math::ratio<TYPE>( 1, 6) * dx));
-		M_coef.push_back(Eigen::Triplet<TYPE>(i-1, i, math::ratio<TYPE>( 1, 6) * dx));
-		K_coef.push_back(Eigen::Triplet<TYPE>(i, i-1, math::ratio<TYPE>(-1, 1) / dx));
-		K_coef.push_back(Eigen::Triplet<TYPE>(i-1, i, math::ratio<TYPE>(-1, 1) / dx));
-	}
-
-	M_coef.push_back(Eigen::Triplet<TYPE>(0, dim-1, math::ratio<TYPE>( 1, 6) * dx));
-	M_coef.push_back(Eigen::Triplet<TYPE>(dim-1, 0, math::ratio<TYPE>( 1, 6) * dx));
-	K_coef.push_back(Eigen::Triplet<TYPE>(0, dim-1, math::ratio<TYPE>(-1, 1) / dx));
-	K_coef.push_back(Eigen::Triplet<TYPE>(dim-1, 0, math::ratio<TYPE>(-1, 1) / dx));
 
 	M.setFromTriplets(M_coef.begin(), M_coef.end());
 	K.setFromTriplets(K_coef.begin(), K_coef.end());
@@ -104,18 +103,23 @@ int main(){
 	//Eigen::SimplicialLDLT<Eigen::SparseMatrix<TYPE> >     solver(M);	
 	//Eigen::BiCGSTAB<Eigen::SparseMatrix<TYPE> >           solver(M);
 	//Eigen::ConjugateGradient<Eigen::SparseMatrix<TYPE> >  solver(M);
+	//Eigen::SparseLU<Eigen::SparseMatrix<TYPE> >           solver(M);	
 	Eigen::SimplicialCholesky<Eigen::SparseMatrix<TYPE> > solver(M);	
+
+	solver.analyzePattern(M);
+	solver.factorize(M);
 
 	FILE *gp;
 	gp = popen("gnuplot -persist", "w");
 	fprintf(gp, "set xr [0:1]\n");
 	fprintf(gp, "set yr [0:1]\n");
-	fprintf(gp, "set size square\n");
+	//fprintf(gp, "set size square\n");
 	fprintf(gp, "set grid\n");
 
 	TYPE t = math::ratio<TYPE>(0, 1);
 	
-	for(auto i=0; t<10.; i++){
+	for(auto i=0; ; i++){
+	//for(auto i=0; i<100000.; i++){
 		t = i*dt;
 
 		u = u + dt * func<TYPE>(solver, K, u);
@@ -135,6 +139,7 @@ int main(){
 			fprintf(gp, "e\n");
 			fflush(gp);
 		}
+		
 	}
 
 	pclose(gp);
