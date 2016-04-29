@@ -17,9 +17,9 @@ using namespace std;
 
 namespace mp = boost::multiprecision;
 using namespace mp;
-typedef mp::cpp_dec_float_100 f100;
+using f100 =  mp::cpp_dec_float_100;
 
-#define TYPE double
+using TYPE = double;
 //#define TYPE f100
 
 static constexpr int INTV = 80;
@@ -211,7 +211,7 @@ LA::vector<T> func(LA::vector<T> const &u){
 	//cout << co << endl;
 	//cout << r_co << endl;
 	
-	auto right_f = [&](T x){
+	auto right_f = [&r_aaa,&r_bbb,&r_ccc](T x){
 		return r_aaa*x*x + r_bbb*x + r_ccc;
 	};
 
