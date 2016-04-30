@@ -31,7 +31,8 @@ void same(T n){
 
 int main(){
 
-	for(size_t i=200000; i<static_cast<size_t>(18446744709551615); ++i){
+	cout << "8 rennzoku" << endl;
+	for(size_t i=2; i<static_cast<size_t>(18446744709551615); ++i){
 		same<size_t>(i);
 	}
 /*	    

@@ -22,12 +22,12 @@ typedef mp::cpp_dec_float_100 f100;
 #define TYPE double
 //#define TYPE f100
 
-static constexpr int INTV = 80;
+static constexpr int INTV = 4;
 
-const int dim = 144;
+const int dim = 2048;
 const TYPE dx = math::ratio<TYPE>(1, dim-1);
 //const TYPE dt = math::ratio<TYPE>(1, 100000);
-const TYPE dt = 0.5*math::ratio<TYPE>(1,6)*dx*dx;
+const TYPE dt = math::ratio<TYPE>(1,6)*dx*dx;
 //const TYPE PI = acos(-1.0);       // NG
 //const TYPE PI = acos(static_cast<TYPE>(-1.0));   // OK
 const TYPE k  = math::ratio<TYPE>(1,1);
