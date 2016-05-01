@@ -20,28 +20,15 @@ namespace mp = boost::multiprecision;
 using namespace mp;
 using f100 = mp::cpp_dec_float_100;
 
-using TYPE = double;
-//using TYPE = f100;
+//using TYPE = double;
+using TYPE = f100;
 
-static constexpr int INTV = 51;
+static constexpr int INTV = 40;
 
-constexpr int dim = 160;
+constexpr int dim = 3000;
 const TYPE dx = math::ratio<TYPE>(1, dim);
-//const TYPE dt = math::ratio<TYPE>(1, 1000);
-const TYPE dt = math::ratio<TYPE>(1,6)*dx*dx;
+const TYPE dt = math::ratio<TYPE>(1, 10*dim);
 //const TYPE PI = acos(static_cast<TYPE>(-1.0));
-const TYPE k  = math::ratio<TYPE>(1,1);
-
-template <typename T>
-T phi_func(int i,T x){
-	if((i-1)*dx < x && x < (i+1)*dx){
-		return math::ratio<T>(1, 1) - abs<T>(x - i*dx)/dx;
-	}else{
-		return math::ratio<T>(0, 1);
-	}
-	cout << "ERROR 32522" << endl;
-	return -1;
-}
 
 template <typename T>
 void init(Eigen::Matrix<T, dim, 1> &u){
@@ -51,13 +38,6 @@ void init(Eigen::Matrix<T, dim, 1> &u){
 		u(i) = math::ratio<T>(10, 10)*exp(-100*(dx*i-a)*(dx*i-a));
 	}
 }
-
-template <typename T>
-//Eigen::Matrix<T, dim, 1> func(Eigen::SimplicialCholesky<Eigen::SparseMatrix<T> > &solver, Eigen::SparseMatrix<T> &K, Eigen::Matrix<T, dim, 1> &u){
-Eigen::Matrix<T, dim, 1> func(auto &solver, Eigen::SparseMatrix<T> &K, Eigen::Matrix<T, dim, 1> &u){
-	return math::ratio<T>(-1, 1) * solver.solve(K * u) - k * u;
-}
-
 int main(){
 
 	cout << fixed << setprecision(numeric_limits<TYPE>::digits10 + 1);
@@ -98,15 +78,16 @@ int main(){
 	//Eigen::BiCGSTAB<Eigen::SparseMatrix<TYPE> >           solver(M);
 	//Eigen::ConjugateGradient<Eigen::SparseMatrix<TYPE> >  solver(M);
 	//Eigen::SparseLU<Eigen::SparseMatrix<TYPE> >           solver(M);	
-	Eigen::SimplicialCholesky<Eigen::SparseMatrix<TYPE> > solver(M);	
+	//Eigen::SimplicialCholesky<Eigen::SparseMatrix<TYPE> > solver(M);	
+	Eigen::SimplicialCholesky<Eigen::SparseMatrix<TYPE> > solver(math::ratio<TYPE>(2, 1)*M + dt*K);	
 
-	solver.analyzePattern(M);
-	solver.factorize(M);
+	solver.analyzePattern(math::ratio<TYPE>(2, 1)*M + dt*K);	
+	solver.factorize(math::ratio<TYPE>(2, 1)*M + dt*K);	
 	
 	FILE *gp;
 	gp = popen("gnuplot -persist", "w");
 	fprintf(gp, "set xr [0:1]\n");
-	//fprintf(gp, "set yr [0:1]\n");
+	fprintf(gp, "set yr [0:1]\n");
 	//fprintf(gp, "set size square\n");
 	fprintf(gp, "set grid\n");
 
@@ -115,7 +96,9 @@ int main(){
 	for(auto i=0;  t<10; i++){
 		t = static_cast<TYPE>(i*dt);
 
-		u = u + dt * func<TYPE>(solver, K, u);
+		//u = u + dt * func<TYPE>(solver, K, u); //Euler method *anntei deha nai
+
+		u = solver.solve((math::ratio<TYPE>(2, 1)*M - dt*K)*u);
 
 		if(i%INTV == 0){
 		//if(false){
