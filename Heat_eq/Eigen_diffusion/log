@@ -1,0 +1,16 @@
+g++ -std=c++14 -Wall -Wextra -O3 -I/opt/local/include -I/usr/local/include   -c -o main.o main.cpp
+main.cpp: In function ‘int main()’:
+main.cpp:130:85: error: invalid static_cast from type ‘const Eigen::CwiseBinaryOp<Eigen::internal::scalar_sum_op<double>, const Eigen::Matrix<double, 160, 1>, const Eigen::CwiseUnaryOp<Eigen::internal::scalar_multiple_op<double>, const Eigen::Matrix<double, 160, 1> > >’ to type ‘double’
+   k2 = func<TYPE>(solver, K, static_cast<TYPE>(u + math::ratio<TYPE>(1, 2) * dt * k1));
+                                                                                     ^
+main.cpp:131:85: error: invalid static_cast from type ‘const Eigen::CwiseBinaryOp<Eigen::internal::scalar_sum_op<double>, const Eigen::Matrix<double, 160, 1>, const Eigen::CwiseUnaryOp<Eigen::internal::scalar_multiple_op<double>, const Eigen::Matrix<double, 160, 1> > >’ to type ‘double’
+   k3 = func<TYPE>(solver, K, static_cast<TYPE>(u + math::ratio<TYPE>(1, 2) * dt * k2));
+                                                                                     ^
+main.cpp:132:85: error: invalid static_cast from type ‘const Eigen::CwiseBinaryOp<Eigen::internal::scalar_sum_op<double>, const Eigen::Matrix<double, 160, 1>, const Eigen::CwiseUnaryOp<Eigen::internal::scalar_multiple_op<double>, const Eigen::Matrix<double, 160, 1> > >’ to type ‘double’
+   k4 = func<TYPE>(solver, K, static_cast<TYPE>(u +                           dt * k3));
+                                                                                     ^
+main.cpp:134:85: error: invalid static_cast from type ‘const Eigen::CwiseBinaryOp<Eigen::internal::scalar_sum_op<double>, const Eigen::Matrix<double, 160, 1>, const Eigen::CwiseUnaryOp<Eigen::internal::scalar_multiple_op<double>, const Eigen::CwiseBinaryOp<Eigen::internal::scalar_sum_op<double>, const Eigen::CwiseBinaryOp<Eigen::internal::scalar_sum_op<double>, const Eigen::CwiseBinaryOp<Eigen::internal::scalar_sum_op<double>, const Eigen::Matrix<double, 160, 1>, const Eigen::CwiseUnaryOp<Eigen::internal::scalar_multiple_op<double>, const Eigen::Matrix<double, 160, 1> > >, const Eigen::CwiseUnaryOp<Eigen::internal::scalar_multiple_op<double>, const Eigen::Matrix<double, 160, 1> > >, const Eigen::Matrix<double, 160, 1> > > >’ to type ‘double’
+   u = static_cast<TYPE>(u + dt * math::ratio<TYPE>(1, 6) * (k1 + 2.*k2 + 2.*k3 + k4));
+                                                                                     ^
+<builtin>: recipe for target 'main.o' failed
+make: *** [main.o] Error 1
