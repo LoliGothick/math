@@ -13,7 +13,7 @@ using namespace std;
 
 namespace mp = boost::multiprecision;
 using namespace mp;
-typedef mp::cpp_dec_float_100 f100;
+using f100 = mp::cpp_dec_float_100;
 
 #define TYPE double
 //#define TYPE f100
