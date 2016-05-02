@@ -18,31 +18,36 @@ namespace mp = boost::multiprecision;
 using namespace mp;
 typedef mp::cpp_dec_float_100 f100;
 
-//#define TYPE double
-#define TYPE f100
+#define TYPE double
+//#define TYPE f100
 
-static constexpr int INTV = 59;
+static constexpr int INTV = 5;
 
-const int dim = 160;
+const int dim = 224;
 const TYPE dx = math::ratio<TYPE>(1, dim);
 //const TYPE dt = math::ratio<TYPE>(1, 1000);
-const TYPE dt = math::ratio<TYPE>(1,6)*dx;
+const TYPE dt = math::ratio<TYPE>(1,6)*dx*dx;
 //const TYPE PI = acos(static_cast<TYPE>(-1.0));
-const TYPE k  = math::ratio<TYPE>(1,1000);
+const TYPE k  = math::ratio<TYPE>(0,dx);
+
 
 template <typename T>
 T phi_func(int i,T x){
 	if((i-1)*dx < x && x < (i+1)*dx){
-		return math::ratio<T>(1, 1) - abs<T>(x - i*dx)/dx;
+		return math::ratio(1, 1) - abs(x - i*dx)/dx;
 	}else{
-		return math::ratio<T>(0, 1);
+		return math::ratio(0, 1);
 	}
 	cout << "ERROR 32522" << endl;
 	return -1;
 }
 
-template <typename T>
-void init(Eigen::Matrix<T, dim, 1> &u){
+template<typename T>
+using Vector = Eigen::Matrix<T, dim, 1>;
+
+template<typename T>
+void init(Vector<T> &u){
+//void init(Eigen::Matrix<T, dim, 1> &u){
 	T a = math::ratio<T>(8, 10);
 	for(auto i=0; i<dim; i++){
 		//u(i) = sin(PI*i*dx);
@@ -77,19 +82,19 @@ int main(){
 	vector<Eigen::Triplet<TYPE> > K_coef;
 
 	for(auto i=0; i<dim; ++i){
-		//M_coef.push_back(Eigen::Triplet<TYPE>(i, i, static_cast<TYPE>(math::ratio<TYPE>(2, 3) * dx)));
-		//K_coef.push_back(Eigen::Triplet<TYPE>(i, i, static_cast<TYPE>(math::ratio<TYPE>(2, 1) / dx)));
-		M_coef.push_back(Eigen::Triplet<TYPE>(i, i, static_cast<TYPE>(math::ratio<TYPE>(2, 3))));
-		K_coef.push_back(Eigen::Triplet<TYPE>(i, i, static_cast<TYPE>(math::ratio<TYPE>(2, 1))));
+		M_coef.push_back(Eigen::Triplet<TYPE>(i, i, static_cast<TYPE>(math::ratio<TYPE>(2, 3) * dx)));
+		K_coef.push_back(Eigen::Triplet<TYPE>(i, i, static_cast<TYPE>(math::ratio<TYPE>(2, 1) / dx)));
+		//M_coef.push_back(Eigen::Triplet<TYPE>(i, i, static_cast<TYPE>(math::ratio<TYPE>(2, 3))));
+		//K_coef.push_back(Eigen::Triplet<TYPE>(i, i, static_cast<TYPE>(math::ratio<TYPE>(2, 1))));
 		
-		//M_coef.push_back(Eigen::Triplet<TYPE>(i, (i+1)%dim, static_cast<TYPE>(math::ratio<TYPE>( 1, 6) * dx)));
-		//M_coef.push_back(Eigen::Triplet<TYPE>((i+1)%dim, i, static_cast<TYPE>(math::ratio<TYPE>( 1, 6) * dx)));
-		//K_coef.push_back(Eigen::Triplet<TYPE>(i, (i+1)%dim, static_cast<TYPE>(math::ratio<TYPE>(-1, 1) / dx)));
-		//K_coef.push_back(Eigen::Triplet<TYPE>((i+1)%dim, i, static_cast<TYPE>(math::ratio<TYPE>(-1, 1) / dx)));
-		M_coef.push_back(Eigen::Triplet<TYPE>(i, (i+1)%dim, static_cast<TYPE>(math::ratio<TYPE>( 1, 6))));
-		M_coef.push_back(Eigen::Triplet<TYPE>((i+1)%dim, i, static_cast<TYPE>(math::ratio<TYPE>( 1, 6))));
-		K_coef.push_back(Eigen::Triplet<TYPE>(i, (i+1)%dim, static_cast<TYPE>(math::ratio<TYPE>(-1, 1))));
-		K_coef.push_back(Eigen::Triplet<TYPE>((i+1)%dim, i, static_cast<TYPE>(math::ratio<TYPE>(-1, 1))));
+		M_coef.push_back(Eigen::Triplet<TYPE>(i, (i+1)%dim, static_cast<TYPE>(math::ratio<TYPE>( 1, 6) * dx)));
+		M_coef.push_back(Eigen::Triplet<TYPE>((i+1)%dim, i, static_cast<TYPE>(math::ratio<TYPE>( 1, 6) * dx)));
+		K_coef.push_back(Eigen::Triplet<TYPE>(i, (i+1)%dim, static_cast<TYPE>(math::ratio<TYPE>(-1, 1) / dx)));
+		K_coef.push_back(Eigen::Triplet<TYPE>((i+1)%dim, i, static_cast<TYPE>(math::ratio<TYPE>(-1, 1) / dx)));
+		//M_coef.push_back(Eigen::Triplet<TYPE>(i, (i+1)%dim, static_cast<TYPE>(math::ratio<TYPE>( 1, 6))));
+		//M_coef.push_back(Eigen::Triplet<TYPE>((i+1)%dim, i, static_cast<TYPE>(math::ratio<TYPE>( 1, 6))));
+		//K_coef.push_back(Eigen::Triplet<TYPE>(i, (i+1)%dim, static_cast<TYPE>(math::ratio<TYPE>(-1, 1))));
+		//K_coef.push_back(Eigen::Triplet<TYPE>((i+1)%dim, i, static_cast<TYPE>(math::ratio<TYPE>(-1, 1))));
 	}
 
 	M.setFromTriplets(M_coef.begin(), M_coef.end());

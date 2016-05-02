@@ -7,6 +7,8 @@ OBJS :=$(SRCS:.cpp=.o)
 $(TARGET): $(OBJS)
 	$(CXX) -o $@ $(OBJS)
 
+RUN=./a
+
 #run: all
 #	./$(TARGET)
 
@@ -15,6 +17,8 @@ all: clean $(TARGET)
 clean:
 	rm $(TARGET) $(OBJS)
 
+run:all
+	${RUN}
 
 
 #a: main.o point2D.o
