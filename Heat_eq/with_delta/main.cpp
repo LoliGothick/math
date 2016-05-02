@@ -24,13 +24,13 @@ using TYPE = double;
 
 static constexpr int INTV = 4;
 
-const int dim = 2048;
-const TYPE dx = math::ratio<TYPE>(1, dim-1);
+static constexpr int dim = 2048;
+static constexpr TYPE dx = math::ratio<TYPE>(1, dim-1);
 //const TYPE dt = math::ratio<TYPE>(1, 100000);
-const TYPE dt = math::ratio<TYPE>(1,6)*dx*dx;
+static constexpr TYPE dt = math::ratio<TYPE>(1,6)*dx*dx;
 //const TYPE PI = acos(-1.0);       // NG
 //const TYPE PI = acos(static_cast<TYPE>(-1.0));   // OK
-const TYPE k  = math::ratio<TYPE>(1,1);
+static constexpr TYPE k  = math::ratio<TYPE>(1,1);
 
 template <typename T>
 T delta_func(int i,T x){
