@@ -1,18 +1,15 @@
 /*
  *  soleve Heat Equation
  *	periodic boundary condition
- *  x in [0,1]
+ *  x in [0,1] (then u(0) == u(dim))
  *
- *  ratio function example: ratio(1, 5) == 1/5
- *
- *  Takaaki MINOMO
+ *  writen by Takaaki MINOMO
  */
 
 #include <iostream>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <Eigen/Sparse>
 #include <Eigen/Dense>
-#include "../../library/ratio.hpp"
 
 using namespace std;
 
@@ -24,23 +21,24 @@ using f100 = mp::cpp_dec_float_100;
 using TYPE = f100;
 
 static constexpr int INTV = 20;
+static constexpr int dim  = 1024;
 
-<<<<<<< HEAD
-constexpr int dim = 300;
-=======
-constexpr int dim = 1024;
->>>>>>> b2afad53f29b0bb3d92f65cf7158bd8074e05c57
-const TYPE dx = math::ratio<TYPE>(1, dim);
-const TYPE dt = math::ratio<TYPE>(1, 10*dim);
+template <typename T>
+constexpr T ratio(const T &a, const T &b){
+	return static_cast<T>(a/b);
+}
+
+const TYPE dx = ratio<TYPE>(1, dim);
+const TYPE dt = ratio<TYPE>(1, 10*dim);
+const TYPE k  = ratio<TYPE>(1, 1);
 //const TYPE PI = acos(static_cast<TYPE>(-1.0));
 
-template<typename T>
-//void init(Vector<T> &u){
+template <typename T>
 void init(Eigen::Matrix<T, dim, 1> &u){
-	T a = math::ratio<T>(8, 10);
+	T a = ratio<T>(8, 10);
 	for(auto i=0; i<dim; i++){
 		//u(i) = sin(PI*i*dx);
-		u(i) = math::ratio<T>(10, 10)*exp(-100*(dx*i-a)*(dx*i-a));
+		u(i) = ratio<T>(1, 1)*exp(-100*(dx*i-a)*(dx*i-a));
 	}
 }
 int main(){
@@ -62,13 +60,13 @@ int main(){
 	vector<Eigen::Triplet<TYPE> > K_coef;
 
 	for(auto i=0; i<dim; ++i){
-		M_coef.push_back(Eigen::Triplet<TYPE>(i, i, static_cast<TYPE>(math::ratio<TYPE>(2, 3) * dx)));
-		K_coef.push_back(Eigen::Triplet<TYPE>(i, i, static_cast<TYPE>(math::ratio<TYPE>(2, 1) / dx)));
+		M_coef.push_back(Eigen::Triplet<TYPE>(i, i, static_cast<TYPE>(ratio<TYPE>(2, 3) * dx)));
+		K_coef.push_back(Eigen::Triplet<TYPE>(i, i, static_cast<TYPE>(ratio<TYPE>(2, 1) / dx)));
 		
-		M_coef.push_back(Eigen::Triplet<TYPE>(i, (i+1)%dim, static_cast<TYPE>(math::ratio<TYPE>( 1, 6) * dx)));
-		M_coef.push_back(Eigen::Triplet<TYPE>((i+1)%dim, i, static_cast<TYPE>(math::ratio<TYPE>( 1, 6) * dx)));
-		K_coef.push_back(Eigen::Triplet<TYPE>(i, (i+1)%dim, static_cast<TYPE>(math::ratio<TYPE>(-1, 1) / dx)));
-		K_coef.push_back(Eigen::Triplet<TYPE>((i+1)%dim, i, static_cast<TYPE>(math::ratio<TYPE>(-1, 1) / dx)));
+		M_coef.push_back(Eigen::Triplet<TYPE>(i, (i+1)%dim, static_cast<TYPE>(ratio<TYPE>( 1, 6) * dx)));
+		M_coef.push_back(Eigen::Triplet<TYPE>((i+1)%dim, i, static_cast<TYPE>(ratio<TYPE>( 1, 6) * dx)));
+		K_coef.push_back(Eigen::Triplet<TYPE>(i, (i+1)%dim, static_cast<TYPE>(ratio<TYPE>(-1, 1) / dx)));
+		K_coef.push_back(Eigen::Triplet<TYPE>((i+1)%dim, i, static_cast<TYPE>(ratio<TYPE>(-1, 1) / dx)));
 	}
 
 	M.setFromTriplets(M_coef.begin(), M_coef.end());
@@ -84,10 +82,14 @@ int main(){
 	//Eigen::ConjugateGradient<Eigen::SparseMatrix<TYPE> >  solver(M);
 	//Eigen::SparseLU<Eigen::SparseMatrix<TYPE> >           solver(M);	
 	//Eigen::SimplicialCholesky<Eigen::SparseMatrix<TYPE> > solver(M);	
-	Eigen::SimplicialCholesky<Eigen::SparseMatrix<TYPE> > solver(math::ratio<TYPE>(2, 1)*M + dt*K);	
+	
+	
+	Eigen::SparseMatrix<TYPE> C = ratio<TYPE>(2, 1)*M + dt*K + dt*k*M;
+	
+	Eigen::SimplicialCholesky<Eigen::SparseMatrix<TYPE> > solver(C);
 
-	solver.analyzePattern(math::ratio<TYPE>(2, 1)*M + dt*K);	
-	solver.factorize(math::ratio<TYPE>(2, 1)*M + dt*K);	
+	solver.analyzePattern(C);
+	solver.factorize(C);
 	
 	FILE *gp;
 	gp = popen("gnuplot -persist", "w");
@@ -96,17 +98,14 @@ int main(){
 	//fprintf(gp, "set size square\n");
 	fprintf(gp, "set grid\n");
 
-	TYPE t = math::ratio<TYPE>(0, 1);
+	TYPE t = ratio<TYPE>(0, 1);
 	
 	for(auto i=0;  t<10; i++){
 		t = static_cast<TYPE>(i*dt);
 
-		//u = u + dt * func<TYPE>(solver, K, u); //Euler method *anntei deha nai
-
-		u = solver.solve((math::ratio<TYPE>(2, 1)*M - dt*K)*u);
+		u = solver.solve((ratio<TYPE>(2, 1)*M - dt*K - dt*k*M)*u);
 
 		if(i%INTV == 0){
-		//if(false){
 			TYPE x = 0.;
 			fprintf(gp, "plot '-' w l lw 1\n");
 			for(auto j=0; j<dim; j++){
@@ -116,7 +115,7 @@ int main(){
 				fprintf(gp, "%f %f \n", a, b);
 				x += dx;
 			}
-			fprintf(gp, "%f %f \n", static_cast<double>(math::ratio<TYPE>(1, 1)), static_cast<double>(u(0)));
+			fprintf(gp, "%f %f \n", static_cast<double>(ratio<TYPE>(1, 1)), static_cast<double>(u(0)));
 			fprintf(gp, "e\n");
 			fflush(gp);
 		}

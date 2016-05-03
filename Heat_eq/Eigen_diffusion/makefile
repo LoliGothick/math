@@ -17,6 +17,7 @@ all: clean $(TARGET)
 clean:
 	rm $(TARGET) $(OBJS)
 
+<<<<<<< HEAD
 run:all
 	${RUN}
 
@@ -30,3 +31,5 @@ run:all
 
 #clean:
 #	rm *.o a
+=======
+>>>>>>> b2afad53f29b0bb3d92f65cf7158bd8074e05c57
