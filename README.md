@@ -2,4 +2,4 @@
 
 math library?
 
-C++ / Boost
+C++ / Boost / Eigen
