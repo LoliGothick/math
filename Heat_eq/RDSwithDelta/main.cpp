@@ -1,5 +1,5 @@
 /*
- *  soleve Heat Equation
+ *  soleve reaction diffusion system with delta function
  *	periodic boundary condition
  *  x in [0,1] (then u(0) == u(dim))
  *
@@ -17,8 +17,8 @@ namespace mp = boost::multiprecision;
 using namespace mp;
 using f100 = mp::cpp_dec_float_100;
 
-//using TYPE = double;
-using TYPE = f100;
+using TYPE = double;
+//using TYPE = f100;
 
 static constexpr int INTV = 20;
 static constexpr int dim  = 1024;
@@ -30,8 +30,19 @@ constexpr T ratio(const T &a, const T &b){
 
 const TYPE dx = ratio<TYPE>(1, dim);
 const TYPE dt = ratio<TYPE>(1, 10*dim);
-const TYPE k  = ratio<TYPE>(1, 1);
+const TYPE k  = ratio<TYPE>(10, 1);
 //const TYPE PI = acos(static_cast<TYPE>(-1.0));
+
+template <typename T>
+T phi_func(int i,T x){
+	if((i-1)*dx < x && x < (i+1)*dx){
+		return 1. - abs(x - i*dx)/dx;
+	}else{
+		return 0;
+	}
+	cout << "ERROR 32522" << endl;
+	return -1;
+}
 
 template <typename T>
 void init(Eigen::Matrix<T, dim, 1> &u){
@@ -42,6 +53,15 @@ void init(Eigen::Matrix<T, dim, 1> &u){
 	}
 }
 int main(){
+
+	int n = 1;
+
+	auto *delta = new TYPE[n];
+	auto *c     = new TYPE[n];
+	delta[0] = static_cast<TYPE>(0.5);
+	c[0]    = static_cast<TYPE>(5.5);
+
+	Eigen::Matrix<TYPE, dim, 1> phi = Eigen::Matrix<TYPE, dim, 1>::Zero();
 
 	cout << fixed << setprecision(numeric_limits<TYPE>::digits10 + 1);
 
@@ -100,10 +120,14 @@ int main(){
 
 	TYPE t = ratio<TYPE>(0, 1);
 	
-	for(auto i=0;  t<10; i++){
+	for(auto i=0;  t<10000000000; i++){
 		t = static_cast<TYPE>(i*dt);
 
-		u = solver.solve((ratio<TYPE>(2, 1)*M - dt*K - dt*k*M)*u);
+		for(auto i=0; i<dim; ++i){
+			phi(i) = c[0] * phi_func(i, delta[0]);
+		}
+
+		u = solver.solve((ratio<TYPE>(2, 1)*M - dt*K - dt*k*M)*u + dt*phi);
 
 		if(i%INTV == 0){
 			TYPE x = 0.;
@@ -122,6 +146,9 @@ int main(){
 	}
 
 	pclose(gp);
-	
+
+	delete[] delta;
+	delete[] c;
+
 	return 0;
 }
