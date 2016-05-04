@@ -7,6 +7,7 @@
  */
 
 #include <iostream>
+#include <random>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <Eigen/Sparse>
 #include <Eigen/Dense>
@@ -30,7 +31,7 @@ constexpr T ratio(const T &a, const T &b){
 
 const TYPE dx = ratio<TYPE>(1, dim);
 const TYPE dt = ratio<TYPE>(1, 10*dim);
-const TYPE k  = ratio<TYPE>(10, 1);
+const TYPE k  = ratio<TYPE>(1, 1);
 //const TYPE PI = acos(static_cast<TYPE>(-1.0));
 
 template <typename T>
@@ -54,13 +55,24 @@ void init(Eigen::Matrix<T, dim, 1> &u){
 }
 int main(){
 
-	int n = 1;
+	constexpr int n = 10;
 
 	auto *delta = new TYPE[n];
 	auto *c     = new TYPE[n];
 	delta[0] = static_cast<TYPE>(0.5);
-	c[0]    = static_cast<TYPE>(5.5);
+	c[0]     = static_cast<TYPE>(5.5);
+	delta[1] = static_cast<TYPE>(0.8);
+	c[1]     = static_cast<TYPE>(3.5);
 
+
+    std::random_device rnd;     // 非決定的な乱数生成器を生成
+	std::mt19937 mt(rnd());     //  メルセンヌ・ツイスタの32ビット版、引数は初期シード値
+	std::uniform_real_distribution<> rand100(0., 1.);        // [0, 99] 範囲の一様乱数
+	for(int i = 0; i < n; ++i) {
+		delta[i] = rand100(mt);
+		c[i]     = rand100(mt);
+	}
+	
 	Eigen::Matrix<TYPE, dim, 1> phi = Eigen::Matrix<TYPE, dim, 1>::Zero();
 
 	cout << fixed << setprecision(numeric_limits<TYPE>::digits10 + 1);
@@ -114,17 +126,19 @@ int main(){
 	FILE *gp;
 	gp = popen("gnuplot -persist", "w");
 	fprintf(gp, "set xr [0:1]\n");
-	fprintf(gp, "set yr [0:1]\n");
+	//fprintf(gp, "set yr [0:1]\n");
 	//fprintf(gp, "set size square\n");
 	fprintf(gp, "set grid\n");
 
-	TYPE t = ratio<TYPE>(0, 1);
+	TYPE t {};
 	
-	for(auto i=0;  t<10000000000; i++){
+	for(auto i=0;  t<2; i++){
 		t = static_cast<TYPE>(i*dt);
 
-		for(auto i=0; i<dim; ++i){
-			phi(i) = c[0] * phi_func(i, delta[0]);
+		for(auto j=0; j<dim; ++j){
+			for(auto k=0; k<n; ++k){
+				phi(j) += c[k] * phi_func(j, delta[k]);
+			}
 		}
 
 		u = solver.solve((ratio<TYPE>(2, 1)*M - dt*K - dt*k*M)*u + dt*phi);
@@ -142,6 +156,9 @@ int main(){
 			fprintf(gp, "%f %f \n", static_cast<double>(ratio<TYPE>(1, 1)), static_cast<double>(u(0)));
 			fprintf(gp, "e\n");
 			fflush(gp);
+		}
+		for(auto j=0; j<dim; ++j){
+			phi(j) = 0.;
 		}
 	}
 
