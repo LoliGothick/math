@@ -1,5 +1,5 @@
-# Linear_Algebra
+# math
 
-math library
+math library?
 
 C++ / Boost
