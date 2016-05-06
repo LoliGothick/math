@@ -21,7 +21,7 @@ using f100 = mp::cpp_dec_float_100;
 using TYPE = double;
 //using TYPE = f100;
 
-static constexpr int INTV = 20;
+static constexpr int INTV = 200;
 static constexpr int dim  = 1024;
 
 template <typename T>
@@ -53,31 +53,36 @@ void init(Eigen::Matrix<T, dim, 1> &u){
 		u(i) = ratio<T>(1, 1)*exp(-100*(dx*i-a)*(dx*i-a));
 	}
 }
+
+template <typename T>
+void CalcDiff(const Eigen::Matrix<T, dim, 1>& u, T* delta, T* diff){
+	size_t pos = delta[0]/dx;
+	diff[0] = (u(pos+1) - u(pos))/dx;
+}
+
 int main(){
 
-	constexpr int n = 10;
+	cout << fixed << setprecision(numeric_limits<TYPE>::digits10 + 1);
+	
+	constexpr int n = 1;
 
-	auto *delta = new TYPE[n];
-	auto *c     = new TYPE[n];
-	delta[0] = static_cast<TYPE>(0.5);
-	c[0]     = static_cast<TYPE>(5.5);
-	delta[1] = static_cast<TYPE>(0.8);
-	c[1]     = static_cast<TYPE>(3.5);
-
+	auto *delta      = new TYPE[n];
+	auto *temp_delta = new TYPE[n];
+	auto *c          = new TYPE[n];
+	auto *diff       = new TYPE[n];
 
     std::random_device rnd;     // 非決定的な乱数生成器を生成
 	std::mt19937 mt(rnd());     //  メルセンヌ・ツイスタの32ビット版、引数は初期シード値
 	std::uniform_real_distribution<> rand100(0., 1.);        // [0, 99] 範囲の一様乱数
 	for(int i = 0; i < n; ++i) {
-		delta[i] = rand100(mt);
-		c[i]     = rand100(mt);
+		delta[i] = 0.5;//rand100(mt);
+		c[i]     = 1.;//rand100(mt);
 	}
 	
 	Eigen::Matrix<TYPE, dim, 1> phi = Eigen::Matrix<TYPE, dim, 1>::Zero();
 
-	cout << fixed << setprecision(numeric_limits<TYPE>::digits10 + 1);
-
-	Eigen::Matrix<TYPE, dim, 1> u = Eigen::Matrix<TYPE, dim, 1>::Zero();
+	Eigen::Matrix<TYPE, dim, 1> u    = Eigen::Matrix<TYPE, dim, 1>::Zero();
+	Eigen::Matrix<TYPE, dim, 1> temp = Eigen::Matrix<TYPE, dim, 1>::Zero();
 
 	Eigen::SparseMatrix<TYPE> M(dim, dim);
 	Eigen::SparseMatrix<TYPE> K(dim, dim);
@@ -131,8 +136,10 @@ int main(){
 	fprintf(gp, "set grid\n");
 
 	TYPE t {};
-	
-	for(auto i=0;  t<2; i++){
+
+	/* main time loop */
+
+	for(auto i=0;  t<10; i++){
 		t = static_cast<TYPE>(i*dt);
 
 		for(auto j=0; j<dim; ++j){
@@ -141,9 +148,11 @@ int main(){
 			}
 		}
 
-		u = solver.solve((ratio<TYPE>(2, 1)*M - dt*K - dt*k*M)*u + dt*phi);
+		temp = solver.solve((ratio<TYPE>(2, 1)*M - dt*K - dt*k*M)*u + dt*phi);
+		CalcDiff(u, delta, diff);
 
 		if(i%INTV == 0){
+			cout << diff[0] << endl;
 			TYPE x = 0.;
 			fprintf(gp, "plot '-' w l lw 1\n");
 			for(auto j=0; j<dim; j++){
@@ -160,11 +169,15 @@ int main(){
 		for(auto j=0; j<dim; ++j){
 			phi(j) = 0.;
 		}
+		/* renew */
+		u = temp;
 	}
 
 	pclose(gp);
 
 	delete[] delta;
+	delete[] temp_delta;
+	delete[] diff;
 	delete[] c;
 
 	return 0;
