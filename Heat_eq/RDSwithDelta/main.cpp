@@ -21,8 +21,8 @@ using f100 = mp::cpp_dec_float_100;
 using TYPE = double;
 //using TYPE = f100;
 
-static constexpr int INTV = 200;
-static constexpr int dim  = 1024;
+static constexpr int INTV = 2;
+static constexpr int dim  = 374;
 
 template <typename T>
 constexpr T ratio(const T &a, const T &b){
@@ -31,7 +31,7 @@ constexpr T ratio(const T &a, const T &b){
 
 const TYPE dx = ratio<TYPE>(1, dim);
 const TYPE dt = ratio<TYPE>(1, 10*dim);
-const TYPE k  = ratio<TYPE>(1, 1);
+const TYPE k  = ratio<TYPE>(10, 1);
 //const TYPE PI = acos(static_cast<TYPE>(-1.0));
 
 template <typename T>
@@ -50,14 +50,67 @@ void init(Eigen::Matrix<T, dim, 1> &u){
 	T a = ratio<T>(8, 10);
 	for(auto i=0; i<dim; i++){
 		//u(i) = sin(PI*i*dx);
-		u(i) = ratio<T>(1, 1)*exp(-100*(dx*i-a)*(dx*i-a));
+		u(i) = ratio<T>(1, 1)*exp(-10*(dx*i-a)*(dx*i-a));
 	}
 }
 
 template <typename T>
 void CalcDiff(const Eigen::Matrix<T, dim, 1>& u, T* delta, T* diff){
 	size_t pos = delta[0]/dx;
-	diff[0] = (u(pos+1) - u(pos))/dx;
+	//cout << pos << endl;
+
+	/* left */
+	static Eigen::Matrix<T, 3, 3> A;
+	
+	T x = pos * dx;
+	for(auto i=0; i<3; ++i){
+		A(i, 0) = x*x;
+		A(i, 1) = x;
+		A(i, 2) = 1.;
+		x -= dx;
+	}
+	
+	Eigen::Matrix<T, 3, 1> b;
+
+	b(0) = u(pos); pos--;
+	b(1) = u(pos); pos--;
+	b(2) = u(pos);
+	
+	Eigen::Matrix<T, 3, 1> co_left = A.inverse()*b;
+	
+	auto left_f = [&](T x){
+		return co_left(0)*x*x + co_left(1)*x + co_left(2);
+	};
+
+	/* right */
+	
+	static Eigen::Matrix<T, 3, 3> B;
+	
+	pos = delta[0]/dx;
+	pos++;
+	x = pos * dx;
+	for(auto i=0; i<3; ++i){
+		B(i, 0) = x*x;
+		B(i, 1) = x;
+		B(i, 2) = 1.;
+		x += dx;
+	}
+	
+	Eigen::Matrix<T, 3, 1> r_b;
+	
+	r_b(0, 0) = u(pos); pos++;
+	r_b(1, 0) = u(pos); pos++;
+	r_b(2, 0) = u(pos);
+	
+	Eigen::Matrix<T, 3, 1> co_right = B.inverse()*r_b;
+	
+	auto right_f = [&](T x){
+		return co_right(0)*x*x + co_right(1)*x + co_right(2);
+	};
+
+	/* symmetric derivative */
+	diff[0] = (right_f(delta[0] + dx/2.) - left_f(delta[0] - dx/2.))/dx;
+	//diff[0] = (right_f(delta[0] + dx) - left_f(delta[0] - dx))/(2.*dx);
 }
 
 int main(){
@@ -73,13 +126,13 @@ int main(){
 
     std::random_device rnd;     // 非決定的な乱数生成器を生成
 	std::mt19937 mt(rnd());     //  メルセンヌ・ツイスタの32ビット版、引数は初期シード値
-	std::uniform_real_distribution<> rand100(0., 1.);        // [0, 99] 範囲の一様乱数
+	std::uniform_real_distribution<> rand100(0., 1.);        // [0, 1] 範囲の一様乱数
 	for(int i = 0; i < n; ++i) {
 		delta[i] = 0.5;//rand100(mt);
-		c[i]     = 1.;//rand100(mt);
+		c[i]     = 10.;//rand100(mt);
 	}
 	
-	Eigen::Matrix<TYPE, dim, 1> phi = Eigen::Matrix<TYPE, dim, 1>::Zero();
+	Eigen::Matrix<TYPE, dim, 1> phi  = Eigen::Matrix<TYPE, dim, 1>::Zero();
 
 	Eigen::Matrix<TYPE, dim, 1> u    = Eigen::Matrix<TYPE, dim, 1>::Zero();
 	Eigen::Matrix<TYPE, dim, 1> temp = Eigen::Matrix<TYPE, dim, 1>::Zero();
@@ -131,7 +184,7 @@ int main(){
 	FILE *gp;
 	gp = popen("gnuplot -persist", "w");
 	fprintf(gp, "set xr [0:1]\n");
-	//fprintf(gp, "set yr [0:1]\n");
+	fprintf(gp, "set yr [0:1]\n");
 	//fprintf(gp, "set size square\n");
 	fprintf(gp, "set grid\n");
 
@@ -139,7 +192,7 @@ int main(){
 
 	/* main time loop */
 
-	for(auto i=0;  t<10; i++){
+	for(auto i=0;  t<100; i++){
 		t = static_cast<TYPE>(i*dt);
 
 		for(auto j=0; j<dim; ++j){
@@ -149,10 +202,15 @@ int main(){
 		}
 
 		temp = solver.solve((ratio<TYPE>(2, 1)*M - dt*K - dt*k*M)*u + dt*phi);
+		
 		CalcDiff(u, delta, diff);
+		
+		//for(auto i=0; i<n; ++i){
+			delta[0] -= dt * diff[0];
+		//}
 
 		if(i%INTV == 0){
-			cout << diff[0] << endl;
+			cout << diff[0] << " " << delta[0] << endl;
 			TYPE x = 0.;
 			fprintf(gp, "plot '-' w l lw 1\n");
 			for(auto j=0; j<dim; j++){
