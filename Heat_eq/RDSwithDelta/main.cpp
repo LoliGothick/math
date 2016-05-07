@@ -23,7 +23,7 @@ using TYPE = double;
 
 static constexpr int INTV = 50;
 static constexpr int dim  = 2048;
-static constexpr int n    = 3;
+static constexpr int n    = 8;
 
 template <typename T>
 constexpr T ratio(const T &a, const T &b){
@@ -76,6 +76,7 @@ void CalcDiff(const Eigen::Matrix<T, dim, 1>& u, T* delta, T* diff){
 			pos = 0;
 		}
 		if(pos > dim){
+			cout << "ERROR 12374912" << endl;
 			pos = 0;
 		}
 
@@ -92,8 +93,10 @@ void CalcDiff(const Eigen::Matrix<T, dim, 1>& u, T* delta, T* diff){
 	
 		Eigen::Matrix<T, 3, 1> b;
 
-		b(0) = u(pos);           pos--;
-		b(1) = u((pos+dim)%dim); pos--;
+		b(0) = u(pos);
+		pos  = ((pos-1)+dim)%dim;
+		b(1) = u((pos+dim)%dim);
+		pos  = ((pos-1)+dim)%dim;
 		b(2) = u((pos+dim)%dim);
 	
 		Eigen::Matrix<T, 3, 1> co_left = A.inverse()*b;
@@ -107,6 +110,7 @@ void CalcDiff(const Eigen::Matrix<T, dim, 1>& u, T* delta, T* diff){
 		Eigen::Matrix<T, 3, 3> B;
 	
 		pos = delta[j]/dx;
+		pos++;
 		x = static_cast<T>(pos * dx);
 		for(auto i=0; i<3; ++i){
 			B(i, 0) = x*x;
@@ -124,8 +128,10 @@ void CalcDiff(const Eigen::Matrix<T, dim, 1>& u, T* delta, T* diff){
 
 		Eigen::Matrix<T, 3, 1> r_b;
 	
-		r_b(0) = u(pos);     pos++;
-		r_b(1) = u(pos%dim); pos++;
+		r_b(0) = u(pos);
+		pos    = (pos+1)%dim;
+		r_b(1) = u(pos%dim);
+		pos    = (pos+1)%dim;
 		r_b(2) = u(pos%dim);
 
 
@@ -223,7 +229,7 @@ int main(){
 	FILE *gp;
 	gp = popen("gnuplot -persist", "w");
 	fprintf(gp, "set xr [0:1]\n");
-	//fprintf(gp, "set yr [0:1]\n");
+	fprintf(gp, "set yr [0:1]\n");
 	//fprintf(gp, "set size square\n");
 	fprintf(gp, "set grid\n");
 
@@ -231,7 +237,7 @@ int main(){
 
 	/* main time loop */
 
-	for(auto i=0;  t<100; i++){
+	for(auto i=0;  t<10000000; i++){
 		t = static_cast<TYPE>(i*dt);
 
 		for(auto j=0; j<dim; ++j){
@@ -241,26 +247,38 @@ int main(){
 		}
 
 		temp = solver.solve((ratio<TYPE>(2, 1)*M - dt*K - dt*k*M)*u + dt*phi);
-		
-		CalcDiff(u, delta, diff);
 
+		CalcDiff(u, delta, diff);
+		
 		for(auto j=0; j<n; ++j){
+			
 			delta[j] -= v * dt * diff[j];
-		//	cout << diff[j] << endl;
-			if(delta[j] < 0){
+			
+			if(delta[j] < 0.){
 				delta[j] += 1.;
 			}
-			if(delta[j] > 1){
+			if(delta[j] > 1.){
 				delta[j] -= 1.;
 			}
 		}
+		
+		
+		for(auto j=0; j<dim; ++j){
+			phi(j) = 0.;
+		}
 
+		/* renew */
+		u = temp;
+
+		/* draw */
 		if(i%INTV == 0){
-			/*
+			
+			cout << t << " ";
 			for(auto j=0; j<n; ++j){
-				cout << diff[j] << " " << delta[j] << endl;
+				cout << delta[j] << " ";
 			}
-			*/
+			cout << endl;
+			
 			TYPE x = 0.;
 			fprintf(gp, "plot '-' w l lw 1\n");
 			for(auto j=0; j<dim; j++){
@@ -274,11 +292,6 @@ int main(){
 			fprintf(gp, "e\n");
 			fflush(gp);
 		}
-		for(auto j=0; j<dim; ++j){
-			phi(j) = 0.;
-		}
-		/* renew */
-		u = temp;
 	}
 
 	pclose(gp);
