@@ -23,6 +23,7 @@ using TYPE = double;
 
 static constexpr int INTV = 100;
 static constexpr int dim  = 1575;
+static constexpr int n    = 2;
 
 template <typename T>
 constexpr T ratio(const T &a, const T &b){
@@ -59,89 +60,90 @@ void init(Eigen::Matrix<T, dim, 1> &u){
 
 template <typename T>
 void CalcDiff(const Eigen::Matrix<T, dim, 1>& u, T* delta, T* diff){
-	
-	int pos = delta[0]/dx;
-	//cout << pos << endl;
 
-	if(pos == dim){
-		cout << "ERROR 12374892" << endl;
-		pos = 0;
+	for(auto j=0; j<n; ++j){
+
+		int pos = delta[j]/dx;
+		//cout << pos << endl;
+
+		if(pos == dim){
+			cout << "ERROR 12374892" << endl;
+			pos = 0;
+		}
+		if(pos > dim){
+			pos = 0;
+		}
+
+		/* left */
+		Eigen::Matrix<T, 3, 3> A;
+	
+		T x = static_cast<T>(pos * dx);
+		for(auto i=0; i<3; ++i){
+			A(i, 0) = x*x;
+			A(i, 1) = x;
+			A(i, 2) = 1.;
+			x -= dx;
+		}
+	
+		Eigen::Matrix<T, 3, 1> b;
+
+		b(0) = u(pos);
+		pos--;
+		b(1) = u((pos+dim)%dim);
+		pos--;
+		b(2) = u((pos+dim)%dim);
+	
+		Eigen::Matrix<T, 3, 1> co_left = A.inverse()*b;
+	
+		auto left_f = [&](T x){
+			return co_left(0)*x*x + co_left(1)*x + co_left(2);
+		};
+
+		/* right */
+	
+		Eigen::Matrix<T, 3, 3> B;
+	
+		pos = delta[0]/dx;
+		x = static_cast<T>(pos * dx);
+		for(auto i=0; i<3; ++i){
+			B(i, 0) = x*x;
+			B(i, 1) = x;
+			B(i, 2) = 1.;
+			x += dx;
+		}
+	
+		pos = pos%dim;
+		if(pos == dim){
+			pos = 0;
+			cout << "wwwwwwwwwwwwwww" << endl;
+		}
+
+
+		Eigen::Matrix<T, 3, 1> r_b;
+	
+		r_b(0) = u(pos);
+		pos++;
+		r_b(1) = u(pos%dim);
+		pos++;
+		r_b(2) = u(pos%dim);
+
+
+		Eigen::Matrix<T, 3, 1> co_right = B.inverse()*r_b;
+	
+		auto right_f = [&](T x){
+			return co_right(0)*x*x + co_right(1)*x + co_right(2);
+		};
+
+		/* symmetric derivative */
+		diff[j] = (right_f(delta[j] + dx/2.) - left_f(delta[j] - dx/2.))/dx;
+		//diff[0] = (right_f(delta[0] + dx) - left_f(delta[0] - dx))/(2.*dx);
 	}
-	if(pos > dim){
-		pos = 0;
-	}
-
-	/* left */
-	static Eigen::Matrix<T, 3, 3> A;
-	
-	T x = static_cast<T>(pos * dx);
-	for(auto i=0; i<3; ++i){
-		A(i, 0) = x*x;
-		A(i, 1) = x;
-		A(i, 2) = 1.;
-		x -= dx;
-	}
-	
-	Eigen::Matrix<T, 3, 1> b;
-
-	b(0) = u(pos);
-	pos--;
-	b(1) = u((pos+dim)%dim);
-	pos--;
-	b(2) = u((pos+dim)%dim);
-	
-	Eigen::Matrix<T, 3, 1> co_left = A.inverse()*b;
-	
-	auto left_f = [&](T x){
-		return co_left(0)*x*x + co_left(1)*x + co_left(2);
-	};
-
-	/* right */
-	
-	static Eigen::Matrix<T, 3, 3> B;
-	
-	pos = delta[0]/dx;
-	x = static_cast<T>(pos * dx);
-	for(auto i=0; i<3; ++i){
-		B(i, 0) = x*x;
-		B(i, 1) = x;
-		B(i, 2) = 1.;
-		x += dx;
-	}
-	
-	pos = pos%dim;
-	if(pos == dim){
-		pos = 0;
-		cout << "wwwwwwwwwwwwwww" << endl;
-	}
-
-
-	Eigen::Matrix<T, 3, 1> r_b;
-	
-	r_b(0) = u(pos);
-	pos++;
-	r_b(1) = u(pos%dim);
-	pos++;
-	r_b(2) = u(pos%dim);
-
-
-	Eigen::Matrix<T, 3, 1> co_right = B.inverse()*r_b;
-	
-	auto right_f = [&](T x){
-		return co_right(0)*x*x + co_right(1)*x + co_right(2);
-	};
-
-	/* symmetric derivative */
-	diff[0] = (right_f(delta[0] + dx/2.) - left_f(delta[0] - dx/2.))/dx;
-	//diff[0] = (right_f(delta[0] + dx) - left_f(delta[0] - dx))/(2.*dx);
 }
 
 int main(){
 
 	cout << fixed << setprecision(numeric_limits<TYPE>::digits10 + 1);
 	
-	constexpr int n = 1;
-
 	auto *delta      = new TYPE[n];
 	auto *temp_delta = new TYPE[n];
 	auto *c          = new TYPE[n];
@@ -151,8 +153,8 @@ int main(){
 	std::mt19937 mt(rnd());     //  メルセンヌ・ツイスタの32ビット版、引数は初期シード値
 	std::uniform_real_distribution<> rand100(0., 1.);        // [0, 1] 範囲の一様乱数
 	for(int i = 0; i < n; ++i) {
-		delta[i] = 0.1;//rand101(mt);
-		c[i]     = 1.0;//rand100(mt);
+		delta[i] = rand100(mt);
+		c[i]     = rand100(mt);
 	}
 	
 	Eigen::Matrix<TYPE, dim, 1> phi  = Eigen::Matrix<TYPE, dim, 1>::Zero();
@@ -227,16 +229,19 @@ int main(){
 		temp = solver.solve((ratio<TYPE>(2, 1)*M - dt*K - dt*k*M)*u + dt*phi);
 		
 		CalcDiff(u, delta, diff);
-		
-		//for(auto i=0; i<n; ++i){
-			delta[0] -= v * dt * diff[0];
-			if(delta[0] < 0){
-				delta[0] += 1.;
+	
+		cout << __LINE__ << endl;
+
+		for(auto j=0; j<n; ++j){
+		//	delta[j] -= v * dt * diff[j];
+			cout << diff[j] << endl;
+			if(delta[j] < 0){
+				delta[j] += 1.;
 			}
-			if(delta[0] > 1){
-				delta[0] -= 1.;
+			if(delta[j] > 1){
+				delta[j] -= 1.;
 			}
-		//}
+		}
 
 		if(i%INTV == 0){
 			cout << diff[0] << " " << delta[0] << endl;
