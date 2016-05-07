@@ -1,7 +1,10 @@
 #ifndef FIXED_IS_FLOATING_POINT_HPP
 #define FIXED_IS_FLOATING_POINT_HPP
+#include <boost/multiprecision/cpp_dec_float.hpp>
 
 namespace concept{
+    namespace mp = boost::multiprecision;
+
     namespace detail{
         template < typename T >
         struct fixed_is_floating_point

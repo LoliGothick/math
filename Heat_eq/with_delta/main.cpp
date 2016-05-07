@@ -35,7 +35,7 @@ static constexpr TYPE k  = math::ratio<TYPE>(1,1);
 
 template <typename T>
 T delta_func(int i,T x){
-	static_assert(detail::fixed_is_floating_point_v<T>,"T is not floating point!");
+	static_assert(concept::fixed_is_floating_point_v<T>,"T is not floating point!");
 
 	if((i-1)*dx < x && x < (i+1)*dx){
 		return 1. - abs(x - i*dx)/dx;
@@ -48,7 +48,7 @@ T delta_func(int i,T x){
 
 template <typename T>
 LA::vector<T> func(LA::vector<T> const &u){
-	static_assert(detail::fixed_is_floating_point_v<T>,"T is not floating point!");
+	static_assert(concept::fixed_is_floating_point_v<T>,"T is not floating point!");
 	
 	static int flag = 0;
 	int dim = u.dim;
@@ -270,7 +270,7 @@ LA::vector<T> func(LA::vector<T> const &u){
 
 template <typename T>
 void init(LA::vector<T> &u){
-	static_assert(detail::fixed_is_floating_point_v<T>,"T is not floating point!");
+	static_assert(concept::fixed_is_floating_point_v<T>,"T is not floating point!");
 
 	T a = 0.4;
 	for(auto i=0; i<u.dim; i++){
