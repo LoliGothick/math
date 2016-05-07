@@ -21,9 +21,9 @@ using f100 = mp::cpp_dec_float_100;
 using TYPE = double;
 //using TYPE = f100;
 
-static constexpr int INTV = 100;
-static constexpr int dim  = 1575;
-static constexpr int n    = 2;
+static constexpr int INTV = 50;
+static constexpr int dim  = 2048;
+static constexpr int n    = 3;
 
 template <typename T>
 constexpr T ratio(const T &a, const T &b){
@@ -59,6 +59,11 @@ void init(Eigen::Matrix<T, dim, 1> &u){
 }
 
 template <typename T>
+T polynomial(Eigen::Matrix<T, 3, 1> co, T x){
+	return co(0)*x*x + co(1)*x + co(2);
+}
+
+template <typename T>
 void CalcDiff(const Eigen::Matrix<T, dim, 1>& u, T* delta, T* diff){
 
 	for(auto j=0; j<n; ++j){
@@ -87,23 +92,21 @@ void CalcDiff(const Eigen::Matrix<T, dim, 1>& u, T* delta, T* diff){
 	
 		Eigen::Matrix<T, 3, 1> b;
 
-		b(0) = u(pos);
-		pos--;
-		b(1) = u((pos+dim)%dim);
-		pos--;
+		b(0) = u(pos);           pos--;
+		b(1) = u((pos+dim)%dim); pos--;
 		b(2) = u((pos+dim)%dim);
 	
 		Eigen::Matrix<T, 3, 1> co_left = A.inverse()*b;
-	
+	/*
 		auto left_f = [&](T x){
 			return co_left(0)*x*x + co_left(1)*x + co_left(2);
 		};
-
+	*/
 		/* right */
 	
 		Eigen::Matrix<T, 3, 3> B;
 	
-		pos = delta[0]/dx;
+		pos = delta[j]/dx;
 		x = static_cast<T>(pos * dx);
 		for(auto i=0; i<3; ++i){
 			B(i, 0) = x*x;
@@ -121,23 +124,34 @@ void CalcDiff(const Eigen::Matrix<T, dim, 1>& u, T* delta, T* diff){
 
 		Eigen::Matrix<T, 3, 1> r_b;
 	
-		r_b(0) = u(pos);
-		pos++;
-		r_b(1) = u(pos%dim);
-		pos++;
+		r_b(0) = u(pos);     pos++;
+		r_b(1) = u(pos%dim); pos++;
 		r_b(2) = u(pos%dim);
 
 
 		Eigen::Matrix<T, 3, 1> co_right = B.inverse()*r_b;
-	
+	/*
 		auto right_f = [&](T x){
 			return co_right(0)*x*x + co_right(1)*x + co_right(2);
 		};
+	*/
+		//cout << A << endl;
+		//cout << B << endl;
 
 		/* symmetric derivative */
-		diff[j] = (right_f(delta[j] + dx/2.) - left_f(delta[j] - dx/2.))/dx;
+		diff[j] = (polynomial(co_right, delta[j] + dx/2.) - polynomial(co_left, delta[j] - dx/2.))/dx;
+		//diff[j] = (right_f(delta[j] + dx/2.) - left_f(delta[j] - dx/2.))/dx;
 		//diff[0] = (right_f(delta[0] + dx) - left_f(delta[0] - dx))/(2.*dx);
+	/*	
+		A    = Eigen::Matrix<T, 3, 3>::Zero();
+		B    = Eigen::Matrix<T, 3, 3>::Zero();
+		b    = Eigen::Matrix<T, 3, 1>::Zero();
+		r_b  = Eigen::Matrix<T, 3, 1>::Zero();
+		co_left   = Eigen::Matrix<TYPE, 3, 1>::Zero();
+		co_right  = Eigen::Matrix<TYPE, 3, 1>::Zero();
+	*/
 	}
+	//cout << __LINE__ << endl;
 }
 
 int main(){
@@ -154,7 +168,7 @@ int main(){
 	std::uniform_real_distribution<> rand100(0., 1.);        // [0, 1] 範囲の一様乱数
 	for(int i = 0; i < n; ++i) {
 		delta[i] = rand100(mt);
-		c[i]     = rand100(mt);
+		c[i]     = 1.;//rand100(mt);
 	}
 	
 	Eigen::Matrix<TYPE, dim, 1> phi  = Eigen::Matrix<TYPE, dim, 1>::Zero();
@@ -229,12 +243,10 @@ int main(){
 		temp = solver.solve((ratio<TYPE>(2, 1)*M - dt*K - dt*k*M)*u + dt*phi);
 		
 		CalcDiff(u, delta, diff);
-	
-		cout << __LINE__ << endl;
 
 		for(auto j=0; j<n; ++j){
-		//	delta[j] -= v * dt * diff[j];
-			cout << diff[j] << endl;
+			delta[j] -= v * dt * diff[j];
+		//	cout << diff[j] << endl;
 			if(delta[j] < 0){
 				delta[j] += 1.;
 			}
@@ -244,7 +256,11 @@ int main(){
 		}
 
 		if(i%INTV == 0){
-			cout << diff[0] << " " << delta[0] << endl;
+			/*
+			for(auto j=0; j<n; ++j){
+				cout << diff[j] << " " << delta[j] << endl;
+			}
+			*/
 			TYPE x = 0.;
 			fprintf(gp, "plot '-' w l lw 1\n");
 			for(auto j=0; j<dim; j++){
