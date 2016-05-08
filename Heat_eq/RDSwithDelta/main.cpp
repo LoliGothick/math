@@ -23,7 +23,7 @@ using TYPE = double;
 
 static constexpr int INTV = 50;
 static constexpr int dim  = 2048;
-static constexpr int n    = 8;
+static constexpr int n    = 2;
 
 template <typename T>
 constexpr T ratio(const T &a, const T &b){
@@ -40,6 +40,9 @@ template <typename T>
 T phi_func(int i,T x){
 	if((i-1)*dx < x && x < (i+1)*dx){
 		return 1. - abs(x - i*dx)/dx;
+	}else if((i == 0) && (1.-dx) < x){
+		x = x - 1.;
+		return 1. - abs(x)/dx;
 	}else{
 		return 0;
 	}
@@ -49,9 +52,9 @@ T phi_func(int i,T x){
 
 template <typename T>
 void init(Eigen::Matrix<T, dim, 1> &u){
-	T a = ratio<T>(1, 10);
-	T b = ratio<T>(1, 10);
-	T c = ratio<T>(4, 10);
+	T a = ratio<T>(5, 10);
+	T b = ratio<T>(5, 10);
+	T c = ratio<T>(1, 10);
 	for(auto i=0; i<dim; i++){
 		//u(i) = sin(PI*i*dx);
 		u(i) = c*ratio<T>(1, 1)*exp(-100.*(dx*i-a)*(dx*i-a)) + c*ratio<T>(1, 1)*exp(-100.*(dx*i-b)*(dx*i-b));
@@ -69,7 +72,6 @@ void CalcDiff(const Eigen::Matrix<T, dim, 1>& u, T* delta, T* diff){
 	for(auto j=0; j<n; ++j){
 
 		int pos = delta[j]/dx;
-		//cout << pos << endl;
 
 		if(pos == dim){
 			cout << "ERROR 12374892" << endl;
@@ -173,9 +175,13 @@ int main(){
 	std::mt19937 mt(rnd());     //  メルセンヌ・ツイスタの32ビット版、引数は初期シード値
 	std::uniform_real_distribution<> rand100(0., 1.);        // [0, 1] 範囲の一様乱数
 	for(int i = 0; i < n; ++i) {
-		delta[i] = rand100(mt);
+		delta[i] = 0.99;//rand100(mt);
+	//	delta[i] = 0.99999;//rand100(mt);
 		c[i]     = 1.;//rand100(mt);
 	}
+	delta[0] = 0.48;//rand100(mt);
+	delta[1] = 0.9996;//rand100(mt);
+	delta[1] = 0.9999;//rand100(mt);
 	
 	Eigen::Matrix<TYPE, dim, 1> phi  = Eigen::Matrix<TYPE, dim, 1>::Zero();
 
