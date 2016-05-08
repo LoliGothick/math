@@ -23,7 +23,7 @@ using TYPE = double;
 
 static constexpr int INTV = 50;
 static constexpr int dim  = 2048;
-static constexpr int n    = 2;
+static constexpr int n    = 7;
 
 template <typename T>
 constexpr T ratio(const T &a, const T &b){
@@ -175,13 +175,9 @@ int main(){
 	std::mt19937 mt(rnd());     //  メルセンヌ・ツイスタの32ビット版、引数は初期シード値
 	std::uniform_real_distribution<> rand100(0., 1.);        // [0, 1] 範囲の一様乱数
 	for(int i = 0; i < n; ++i) {
-		delta[i] = 0.99;//rand100(mt);
-	//	delta[i] = 0.99999;//rand100(mt);
+		delta[i] = rand100(mt);
 		c[i]     = 1.;//rand100(mt);
 	}
-	delta[0] = 0.48;//rand100(mt);
-	delta[1] = 0.9996;//rand100(mt);
-	delta[1] = 0.9999;//rand100(mt);
 	
 	Eigen::Matrix<TYPE, dim, 1> phi  = Eigen::Matrix<TYPE, dim, 1>::Zero();
 
@@ -243,7 +239,7 @@ int main(){
 
 	/* main time loop */
 
-	for(auto i=0;  t<10000000; i++){
+	for(auto i=0;  t<=1; i++){
 		t = static_cast<TYPE>(i*dt);
 
 		for(auto j=0; j<dim; ++j){
